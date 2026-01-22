@@ -43,6 +43,10 @@ jwt:
   access-token-expirations: ${JWT_ACCESS_TOKEN_EXPIRATIONS}
   refresh-token-expirations: ${JWT_REFRESH_TOKEN_EXPIRATIONS}
 
+ai:
+  server:
+    url: ${AI_SERVER_URL:http://localhost:8000}
+
 logging:
   level:
     org.springframework.security: DEBUG
