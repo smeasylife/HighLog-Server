@@ -139,7 +139,8 @@ public class AuthService {
         String newAccessToken = jwtService.generateAccessToken(userId, email);
         String newRefreshToken = jwtService.generateRefreshToken(userId, email);
 
-        // 새 Refresh Token 저장
+        // 기존 Refresh Token 삭제 후 새 Refresh Token 저장
+        redisService.deleteRefreshToken(userId);
         redisService.saveRefreshToken(userId, newRefreshToken,
                 jwtService.getRefreshTokenExpiration() / 1000);
 
