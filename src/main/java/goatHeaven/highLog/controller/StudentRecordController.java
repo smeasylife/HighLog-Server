@@ -4,11 +4,13 @@ import goatHeaven.highLog.domain.Question;
 import goatHeaven.highLog.dto.request.StudentRecordRequest;
 import goatHeaven.highLog.dto.response.MessageResponse;
 import goatHeaven.highLog.dto.response.StudentRecordResponse;
+import goatHeaven.highLog.security.CustomUserPrincipal;
 import goatHeaven.highLog.service.StudentRecordService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -23,8 +25,8 @@ public class StudentRecordController {
     @PostMapping
     public ResponseEntity<StudentRecordResponse> saveRecord(
             @Valid @RequestBody StudentRecordRequest request,
-            Authentication authentication) {
-        StudentRecordResponse response = studentRecordService.saveRecord(authentication, request);
+            @AuthenticationPrincipal CustomUserPrincipal principal) {
+        StudentRecordResponse response = studentRecordService.saveRecord(principal.getUserId(), request);
         return ResponseEntity.status(201).body(response);
     }
 

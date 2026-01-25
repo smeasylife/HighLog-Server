@@ -5,6 +5,7 @@ import goatHeaven.highLog.domain.StudentRecord;
 import goatHeaven.highLog.domain.User;
 import goatHeaven.highLog.dto.request.StudentRecordRequest;
 import goatHeaven.highLog.dto.response.StudentRecordResponse;
+import goatHeaven.highLog.enums.RecordStatus;
 import goatHeaven.highLog.exception.CustomException;
 import goatHeaven.highLog.exception.ErrorCode;
 import goatHeaven.highLog.repository.QuestionRepository;
@@ -29,9 +30,8 @@ public class StudentRecordService {
     private final AiService aiService;
 
     @Transactional
-    public StudentRecordResponse saveRecord(Authentication authentication,
+    public StudentRecordResponse saveRecord(Long userId,
                                            StudentRecordRequest request) {
-        Long userId = Long.parseLong(authentication.getName());
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
@@ -42,17 +42,16 @@ public class StudentRecordService {
                 .targetSchool(request.getTargetSchool())
                 .targetMajor(request.getTargetMajor())
                 .interviewType(request.getInterviewType())
-                .status(StudentRecord.RecordStatus.PENDING)
+                .status(RecordStatus.PENDING)
                 .build();
 
         record = studentRecordRepository.save(record);
 
-        // 비동기로 벡터화 시작
         boolean vectorizationStarted = aiService.vectorizeRecord(record.getId());
         if (!vectorizationStarted) {
             log.warn("Failed to start vectorization for record: {}", record.getId());
         } else {
-            record.updateStatus(StudentRecord.RecordStatus.READY);
+            record.updateStatus(RecordStatus.READY);
         }
 
         return new StudentRecordResponse(record);

@@ -25,12 +25,6 @@ public class AiService {
     @Value("${ai.server.url}")
     private String aiServerUrl;
 
-    /**
-     * FastAPI 서버에 질문 생성을 요청하고 SSE 이벤트를 반환합니다.
-     *
-     * @param recordId 생기부 ID
-     * @return SSE 이벤트 스트림
-     */
     public Flux<QuestionGenerationEvent> generateQuestions(Long recordId) {
         WebClient webClient = webClientBuilder
                 .baseUrl(aiServerUrl)
@@ -47,12 +41,6 @@ public class AiService {
                 .doOnError(error -> log.error("AI service error", error));
     }
 
-    /**
-     * 생기부 PDF를 벡터화하고 벡터 DB에 저장합니다.
-     *
-     * @param recordId 생기부 ID
-     * @return 성공 여부
-     */
     public boolean vectorizeRecord(Long recordId) {
         try {
             WebClient webClient = webClientBuilder

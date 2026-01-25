@@ -5,6 +5,7 @@ import goatHeaven.highLog.domain.StudentRecord;
 import goatHeaven.highLog.dto.response.BookmarkQuestionResponse;
 import goatHeaven.highLog.dto.response.BookmarkResponse;
 import goatHeaven.highLog.dto.response.QuestionGenerationEvent;
+import goatHeaven.highLog.enums.RecordStatus;
 import goatHeaven.highLog.exception.CustomException;
 import goatHeaven.highLog.exception.ErrorCode;
 import goatHeaven.highLog.repository.QuestionRepository;
@@ -35,7 +36,7 @@ public class QuestionService {
         StudentRecord record = studentRecordRepository.findByUserIdAndId(userId, recordId)
                 .orElseThrow(() -> new CustomException(ErrorCode.RECORD_NOT_FOUND));
 
-        if (record.getStatus() != StudentRecord.RecordStatus.READY) {
+        if (record.getStatus() != RecordStatus.READY) {
             return Flux.error(new CustomException(ErrorCode.RECORD_NOT_READY));
         }
 
