@@ -35,11 +35,6 @@ public class AuthService {
     public EmailVerifyResponse sendOtp(EmailVerifyRequest request) {
         String email = request.getEmail();
 
-        // 이메일 형식 검증 (@gmail.com 도메인)
-        if (!isValidGoogleEmail(email)) {
-            throw new CustomException(ErrorCode.INVALID_EMAIL_FORMAT);
-        }
-
         // 이미 가입된 이메일인지 확인
         if (userRepository.existsByEmail(email)) {
             throw new CustomException(ErrorCode.EMAIL_ALREADY_EXISTS);
@@ -111,8 +106,8 @@ public class AuthService {
             throw new CustomException(ErrorCode.INVALID_CREDENTIALS);
         }
 
-        String accessToken = jwtService.generateAccessToken(user.getId(), user.getEmail());
-        String refreshToken = jwtService.generateRefreshToken(user.getId(), user.getEmail());
+        String accessToken = jwtService.generateAccessToken(user.getId(), user.getEmail(), user.getRole());
+        String refreshToken = jwtService.generateRefreshToken(user.getId(), user.getEmail(), user.getRole());
 
         // Refresh Token을 Redis에 저장
         redisService.saveRefreshToken(user.getId(), refreshToken,
@@ -128,16 +123,19 @@ public class AuthService {
         jwtService.validateToken(refreshToken);
 
         Long userId = jwtService.getUserIdFromToken(refreshToken);
-        String email = jwtService.getEmailFromToken(refreshToken);
 
         // Redis에 저장된 토큰과 비교
         if (!redisService.validateRefreshToken(userId, refreshToken)) {
             throw new CustomException(ErrorCode.INVALID_TOKEN);
         }
 
+        // User 조회
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+
         // 새 토큰 발급
-        String newAccessToken = jwtService.generateAccessToken(userId, email);
-        String newRefreshToken = jwtService.generateRefreshToken(userId, email);
+        String newAccessToken = jwtService.generateAccessToken(user.getId(), user.getEmail(), user.getRole());
+        String newRefreshToken = jwtService.generateRefreshToken(user.getId(), user.getEmail(), user.getRole());
 
         // 기존 Refresh Token 삭제 후 새 Refresh Token 저장
         redisService.deleteRefreshToken(userId);
