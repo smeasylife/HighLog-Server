@@ -32,6 +32,10 @@ public class User {
     @Column(name = "marketing_agreement")
     private Boolean marketingAgreement = false;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 20)
+    private Role role = Role.MEMBER;
+
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
 
@@ -50,11 +54,12 @@ public class User {
     }
 
     @Builder
-    public User(String email, String password, String name, Boolean marketingAgreement) {
+    public User(String email, String password, String name, Boolean marketingAgreement, Role role) {
         this.email = email;
         this.password = password;
         this.name = name;
         this.marketingAgreement = marketingAgreement != null ? marketingAgreement : false;
+        this.role = role != null ? role : Role.MEMBER;
     }
 
     public void updatePassword(String password) {

@@ -43,6 +43,11 @@ jwt:
   access-token-expirations: ${JWT_ACCESS_TOKEN_EXPIRATIONS}
   refresh-token-expirations: ${JWT_REFRESH_TOKEN_EXPIRATIONS}
 
+admin:
+  email: ${ADMIN_EMAIL}
+  password: ${ADMIN_PASSWORD}
+  name: ${ADMIN_NAME:관리자}
+
 logging:
   level:
     org.springframework.security: DEBUG
