@@ -128,7 +128,6 @@ POST /api/auth/signup
   "userId": 1,
   "email": "student@university.ac.kr",
   "name": "홍길동",
-  "university": "서울대학교",
   "createdAt": "2024-05-20T10:00:00Z"
 }
 ```
@@ -154,7 +153,7 @@ POST /api/auth/login
 **Request Body**
 ```json
 {
-  "email": "student@university.ac.kr",
+  "email": "student@gmail.com",
   "password": "SecurePassword123!"
 }
 ```
@@ -166,9 +165,8 @@ POST /api/auth/login
   "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
   "user": {
     "id": 1,
-    "email": "student@university.ac.kr",
-    "name": "홍길동",
-    "university": "서울대학교"
+    "email": "student@gmail.com",
+    "name": "홍길동"
   }
 }
 ```
