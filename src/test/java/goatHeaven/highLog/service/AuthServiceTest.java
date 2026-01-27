@@ -1,5 +1,6 @@
 package goatHeaven.highLog.service;
 
+import goatHeaven.highLog.domain.Role;
 import goatHeaven.highLog.domain.User;
 import goatHeaven.highLog.dto.request.*;
 import goatHeaven.highLog.dto.response.*;
@@ -217,8 +218,8 @@ class AuthServiceTest {
 
             given(userRepository.findByEmail(TEST_EMAIL)).willReturn(Optional.of(user));
             given(passwordEncoder.matches(TEST_PASSWORD, "encoded-password")).willReturn(true);
-            given(jwtService.generateAccessToken(1L, TEST_EMAIL)).willReturn(TEST_ACCESS_TOKEN);
-            given(jwtService.generateRefreshToken(1L, TEST_EMAIL)).willReturn(TEST_REFRESH_TOKEN);
+            given(jwtService.generateAccessToken(1L, TEST_EMAIL, Role.MEMBER)).willReturn(TEST_ACCESS_TOKEN);
+            given(jwtService.generateRefreshToken(1L, TEST_EMAIL, Role.MEMBER)).willReturn(TEST_REFRESH_TOKEN);
             given(jwtService.getRefreshTokenExpiration()).willReturn(604800000L);
 
             // when
@@ -277,8 +278,8 @@ class AuthServiceTest {
             given(jwtService.getUserIdFromToken(TEST_REFRESH_TOKEN)).willReturn(1L);
             given(jwtService.getEmailFromToken(TEST_REFRESH_TOKEN)).willReturn(TEST_EMAIL);
             given(redisService.validateRefreshToken(1L, TEST_REFRESH_TOKEN)).willReturn(true);
-            given(jwtService.generateAccessToken(1L, TEST_EMAIL)).willReturn(newAccessToken);
-            given(jwtService.generateRefreshToken(1L, TEST_EMAIL)).willReturn(newRefreshToken);
+            given(jwtService.generateAccessToken(1L, TEST_EMAIL, Role.MEMBER)).willReturn(newAccessToken);
+            given(jwtService.generateRefreshToken(1L, TEST_EMAIL, Role.MEMBER)).willReturn(newRefreshToken);
             given(jwtService.getRefreshTokenExpiration()).willReturn(604800000L);
 
             // when

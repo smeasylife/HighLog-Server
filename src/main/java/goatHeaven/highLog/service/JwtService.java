@@ -1,5 +1,6 @@
 package goatHeaven.highLog.service;
 
+import goatHeaven.highLog.domain.Role;
 import goatHeaven.highLog.exception.CustomException;
 import goatHeaven.highLog.exception.ErrorCode;
 import io.jsonwebtoken.*;
@@ -31,21 +32,22 @@ public class JwtService {
         this.key = Keys.hmacShaKeyFor(secretKey.getBytes(StandardCharsets.UTF_8));
     }
 
-    public String generateAccessToken(Long userId, String email) {
-        return generateToken(userId, email, accessTokenExpiration);
+    public String generateAccessToken(Long userId, String email, Role role) {
+        return generateToken(userId, email, role, accessTokenExpiration);
     }
 
-    public String generateRefreshToken(Long userId, String email) {
-        return generateToken(userId, email, refreshTokenExpiration);
+    public String generateRefreshToken(Long userId, String email, Role role) {
+        return generateToken(userId, email, role, refreshTokenExpiration);
     }
 
-    private String generateToken(Long userId, String email, long expiration) {
+    private String generateToken(Long userId, String email, Role role, long expiration) {
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() + expiration);
 
         return Jwts.builder()
                 .subject(String.valueOf(userId))
                 .claim("email", email)
+                .claim("role", role.name())
                 .issuedAt(now)
                 .expiration(expiryDate)
                 .signWith(key)
@@ -60,6 +62,12 @@ public class JwtService {
     public String getEmailFromToken(String token) {
         Claims claims = parseClaims(token);
         return claims.get("email", String.class);
+    }
+
+    public Role getRoleFromToken(String token) {
+        Claims claims = parseClaims(token);
+        String roleStr = claims.get("role", String.class);
+        return Role.valueOf(roleStr);
     }
 
     public boolean validateToken(String token) {

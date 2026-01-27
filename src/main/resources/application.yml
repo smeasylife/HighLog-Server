@@ -43,9 +43,10 @@ jwt:
   access-token-expirations: ${JWT_ACCESS_TOKEN_EXPIRATIONS}
   refresh-token-expirations: ${JWT_REFRESH_TOKEN_EXPIRATIONS}
 
-ai:
-  server:
-    url: ${AI_SERVER_URL:http://localhost:8000}
+admin:
+  email: ${ADMIN_EMAIL}
+  password: ${ADMIN_PASSWORD}
+  name: ${ADMIN_NAME:관리자}
 
 logging:
   level:
