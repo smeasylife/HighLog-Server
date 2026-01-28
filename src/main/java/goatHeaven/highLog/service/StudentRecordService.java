@@ -1,0 +1,59 @@
+package goatHeaven.highLog.service;
+
+import goatHeaven.highLog.domain.StudentRecord;
+import goatHeaven.highLog.dto.response.StudentRecordResponse;
+import goatHeaven.highLog.exception.CustomException;
+import goatHeaven.highLog.exception.ErrorCode;
+import goatHeaven.highLog.repository.StudentRecordRepository;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+
+@Slf4j
+@Service
+@RequiredArgsConstructor
+public class StudentRecordService {
+
+    private final StudentRecordRepository studentRecordRepository;
+    private final S3Service s3Service;
+
+    public List<StudentRecordResponse> getRecords(Long userId) {
+        return studentRecordRepository.findByUserIdOrderByCreatedAtDesc(userId)
+                .stream()
+                .map(StudentRecordResponse::new)
+                .toList();
+    }
+
+    public StudentRecordResponse getRecord(Long recordId, Long userId) {
+        StudentRecord record = studentRecordRepository.findById(recordId)
+                .orElseThrow(() -> new CustomException(ErrorCode.RECORD_NOT_FOUND));
+
+        // 본인의 생기부만 조회 가능
+        if (!record.isOwner(userId)) {
+            throw new CustomException(ErrorCode.FORBIDDEN);
+        }
+
+        return new StudentRecordResponse(record);
+    }
+
+    @Transactional
+    public void deleteRecord(Long recordId, Long userId) {
+        StudentRecord record = studentRecordRepository.findById(recordId)
+                .orElseThrow(() -> new CustomException(ErrorCode.RECORD_NOT_FOUND));
+
+        // 본인의 생기부만 삭제 가능
+        if (!record.isOwner(userId)) {
+            throw new CustomException(ErrorCode.FORBIDDEN);
+        }
+
+        // S3에서 파일 삭제
+        if (record.getS3Key() != null) {
+            s3Service.deleteFile(record.getS3Key());
+        }
+
+        studentRecordRepository.delete(record);
+    }
+}
