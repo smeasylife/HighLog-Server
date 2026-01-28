@@ -1,15 +1,13 @@
 package goatHeaven.highLog.controller;
 
-import goatHeaven.highLog.domain.Question;
-import goatHeaven.highLog.dto.request.StudentRecordRequest;
 import goatHeaven.highLog.dto.response.MessageResponse;
+import goatHeaven.highLog.dto.response.PresignedUrlResponse;
 import goatHeaven.highLog.dto.response.StudentRecordResponse;
 import goatHeaven.highLog.security.CustomUserPrincipal;
+import goatHeaven.highLog.service.S3Service;
 import goatHeaven.highLog.service.StudentRecordService;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,61 +19,36 @@ import java.util.List;
 public class StudentRecordController {
 
     private final StudentRecordService studentRecordService;
+    private final S3Service s3Service;
 
-    @PostMapping
-    public ResponseEntity<StudentRecordResponse> saveRecord(
-            @Valid @RequestBody StudentRecordRequest request,
+    @GetMapping("/presigned-url")
+    public ResponseEntity<PresignedUrlResponse> getPresignedUrl(
+            @RequestParam String fileName,
             @AuthenticationPrincipal CustomUserPrincipal principal) {
-        StudentRecordResponse response = studentRecordService.saveRecord(principal.getUserId(), request);
-        return ResponseEntity.status(201).body(response);
-    }
-
-    /**
-     * 생기부 목록 조회
-     * GET /api/records
-     */
-    @GetMapping
-    public ResponseEntity<List<StudentRecordResponse>> getRecords(Authentication authentication) {
-        List<StudentRecordResponse> responses = studentRecordService.getRecords(authentication);
-        return ResponseEntity.ok(responses);
-    }
-
-    /**
-     * 특정 생기부 조회
-     * GET /api/records/{recordId}
-     */
-    @GetMapping("/{recordId}")
-    public ResponseEntity<StudentRecordResponse> getRecord(
-            @PathVariable Long recordId,
-            Authentication authentication) {
-        StudentRecordResponse response = studentRecordService.getRecord(recordId, authentication);
+        PresignedUrlResponse response = s3Service.generatePresignedUrl(fileName, principal.getUserId());
         return ResponseEntity.ok(response);
     }
 
-    /**
-     * 생기부 삭제
-     * DELETE /api/records/{recordId}
-     */
+    @GetMapping
+    public ResponseEntity<List<StudentRecordResponse>> getRecords(
+            @AuthenticationPrincipal CustomUserPrincipal principal) {
+        List<StudentRecordResponse> responses = studentRecordService.getRecords(principal.getUserId());
+        return ResponseEntity.ok(responses);
+    }
+
+    @GetMapping("/{recordId}")
+    public ResponseEntity<StudentRecordResponse> getRecord(
+            @PathVariable Long recordId,
+            @AuthenticationPrincipal CustomUserPrincipal principal) {
+        StudentRecordResponse response = studentRecordService.getRecord(recordId, principal.getUserId());
+        return ResponseEntity.ok(response);
+    }
+
     @DeleteMapping("/{recordId}")
     public ResponseEntity<MessageResponse> deleteRecord(
             @PathVariable Long recordId,
-            Authentication authentication) {
-        studentRecordService.deleteRecord(recordId, authentication);
+            @AuthenticationPrincipal CustomUserPrincipal principal) {
+        studentRecordService.deleteRecord(recordId, principal.getUserId());
         return ResponseEntity.ok(MessageResponse.of("생기부가 삭제되었습니다."));
-    }
-
-    /**
-     * 생기부 질문 목록 조회
-     * GET /api/records/{recordId}/questions
-     */
-    @GetMapping("/{recordId}/questions")
-    public ResponseEntity<List<Question>> getQuestions(
-            @PathVariable Long recordId,
-            @RequestParam(required = false) String category,
-            @RequestParam(required = false) Question.Difficulty difficulty,
-            Authentication authentication) {
-        List<Question> questions = studentRecordService.getQuestions(
-                recordId, category, difficulty, authentication);
-        return ResponseEntity.ok(questions);
     }
 }

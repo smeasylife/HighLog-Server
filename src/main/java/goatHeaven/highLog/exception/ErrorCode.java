@@ -34,6 +34,12 @@ public enum ErrorCode {
     // AI Service
     AI_SERVICE_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "AI001", "AI 서비스 오류가 발생했습니다."),
 
+    // S3
+    INVALID_FILE_EXTENSION(HttpStatus.BAD_REQUEST, "S3001", "PDF 파일만 업로드할 수 있습니다."),
+    INVALID_FILE_NAME(HttpStatus.BAD_REQUEST, "S3002", "잘못된 파일명입니다."),
+    S3_PRESIGNED_URL_GENERATION_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "S3003", "Presigned URL 생성에 실패했습니다."),
+    S3_FILE_DELETE_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "S3004", "S3 파일 삭제에 실패했습니다."),
+
     // Common
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "COMMON001", "서버 내부 오류가 발생했습니다."),
     INVALID_INPUT_VALUE(HttpStatus.BAD_REQUEST, "COMMON002", "잘못된 입력값입니다.");
