@@ -30,6 +30,24 @@ public enum ErrorCode {
     // Question
     QUESTION_NOT_FOUND(HttpStatus.NOT_FOUND, "QUESTION001", "해당 질문을 찾을 수 없습니다."),
 
+    // Student Record
+    RECORD_NOT_FOUND(HttpStatus.NOT_FOUND, "RECORD001", "생기부를 찾을 수 없습니다."),
+    RECORD_NOT_READY(HttpStatus.BAD_REQUEST, "RECORD002", "생기부 분석이 완료되지 않았습니다."),
+    FORBIDDEN(HttpStatus.FORBIDDEN, "RECORD003", "접근 권한이 없습니다."),
+
+    // Question
+    QUESTION_NOT_FOUND(HttpStatus.NOT_FOUND, "QUESTION001", "질문을 찾을 수 없습니다."),
+    QUESTIONS_ALREADY_EXIST(HttpStatus.CONFLICT, "QUESTION002", "이미 질문이 생성되었습니다."),
+
+    // AI Service
+    AI_SERVICE_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "AI001", "AI 서비스 오류가 발생했습니다."),
+
+    // S3
+    INVALID_FILE_EXTENSION(HttpStatus.BAD_REQUEST, "S3001", "PDF 파일만 업로드할 수 있습니다."),
+    INVALID_FILE_NAME(HttpStatus.BAD_REQUEST, "S3002", "잘못된 파일명입니다."),
+    S3_PRESIGNED_URL_GENERATION_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "S3003", "Presigned URL 생성에 실패했습니다."),
+    S3_FILE_DELETE_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "S3004", "S3 파일 삭제에 실패했습니다."),
+
     // Common
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "COMMON001", "서버 내부 오류가 발생했습니다."),
     INVALID_INPUT_VALUE(HttpStatus.BAD_REQUEST, "COMMON002", "잘못된 입력값입니다.");

@@ -2,9 +2,7 @@ package goatHeaven.highLog.domain;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
@@ -24,6 +22,7 @@ public class Question {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "record_id", nullable = false)
+    @Setter
     private StudentRecord record;
 
     @Column(nullable = false, length = 50)
@@ -42,6 +41,9 @@ public class Question {
     @Column(name = "model_answer", columnDefinition = "TEXT")
     private String modelAnswer;
 
+    @Column(name = "model_answer_criteria", columnDefinition = "TEXT")
+    private String modelAnswerCriteria;
+
     @Column(name = "question_purpose", columnDefinition = "TEXT")
     private String questionPurpose;
 
@@ -58,12 +60,16 @@ public class Question {
 
     @Builder
     public Question(StudentRecord record, String category, String content,
-                    Difficulty difficulty, String modelAnswer) {
+                   Difficulty difficulty, String modelAnswer, String modelAnswerCriteria,
+                   String questionPurpose, String answerPoints) {
         this.record = record;
         this.category = category;
         this.content = content;
         this.difficulty = difficulty;
         this.modelAnswer = modelAnswer;
+        this.modelAnswerCriteria = modelAnswerCriteria;
+        this.questionPurpose = questionPurpose;
+        this.answerPoints = answerPoints;
         this.isBookmarked = false;
     }
 

@@ -1,5 +1,6 @@
 package goatHeaven.highLog.domain;
 
+import goatHeaven.highLog.enums.RecordStatus;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -25,7 +26,7 @@ public class StudentRecord {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 255)
     private String title;
 
     @Column(name = "s3_key", nullable = false, length = 512)
@@ -41,7 +42,7 @@ public class StudentRecord {
     private String interviewType;
 
     @Enumerated(EnumType.STRING)
-    @Column(length = 20)
+    @Column(nullable = false, length = 20)
     private RecordStatus status = RecordStatus.PENDING;
 
     @Column(name = "created_at", updatable = false)
@@ -57,7 +58,7 @@ public class StudentRecord {
 
     @Builder
     public StudentRecord(User user, String title, String s3Key, String targetSchool,
-                         String targetMajor, String interviewType, RecordStatus status) {
+                        String targetMajor, String interviewType, RecordStatus status) {
         this.user = user;
         this.title = title;
         this.s3Key = s3Key;
@@ -72,5 +73,9 @@ public class StudentRecord {
         if (status == RecordStatus.READY) {
             this.analyzedAt = LocalDateTime.now();
         }
+    }
+
+    public boolean isOwner(Long userId) {
+        return this.user.getId().equals(userId);
     }
 }

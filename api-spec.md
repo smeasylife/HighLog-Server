@@ -283,57 +283,7 @@ GET /api/records/presigned-url?fileName=my_record.pdf
 
 ---
 
-### 2-2. 생기부 등록 및 분석 요청
-
-S3 업로드 완료 후 파일 경로와 메타데이터를 저장하며 AI 질문 생성을 시작합니다.
-
-**Endpoint**
-```
-POST /api/records
-```
-
-**Headers**
-```
-Authorization: Bearer {accessToken}
-```
-
-**Request Body**
-```json
-{
-  "title": "2025학년도 생기부",
-  "s3Key": "users/1/records/uuid_filename.pdf",
-  "targetSchool": "한국대학교",
-  "targetMajor": "컴퓨터공학과",
-  "interviewType": "종합전형"
-}
-```
-
-**Response**
-```json
-{
-  "id": 10,
-  "title": "2025학년도 생기부",
-  "targetSchool": "한국대학교",
-  "targetMajor": "컴퓨터공학과",
-  "interviewType": "종합전형",
-  "status": "ANALYZING",
-  "createdAt": "2024-05-20T10:00:00Z"
-}
-```
-
-**Error Cases**
-- `400 Bad Request`: 필수 정보가 누락되었습니다.
-- `500 Internal Server Error`: AI 분석 엔진 호출에 실패했습니다.
-
-**분석 상태**
-- `PENDING`: 대기 중
-- `ANALYZING`: 분석 진행 중
-- `READY`: 분석 완료, 면접 가능
-- `FAILED`: 분석 실패
-
----
-
-### 2-3. 생기부 목록 조회
+### 2-2. 생기부 목록 조회
 
 로그인한 사용자가 등록한 모든 생활기록부의 목록을 조회합니다.
 
@@ -355,18 +305,18 @@ Authorization: Bearer {accessToken}
     "title": "2025학년도 수시 대비 생기부",
     "targetSchool": "한국대학교",
     "targetMajor": "컴퓨터공학과",
+    "interviewType": "수시",
     "status": "READY",
-    "createdAt": "2024-05-20T10:00:00Z",
-    "analyzedAt": "2024-05-20T10:15:00Z"
+    "createdAt": "2024-05-20T10:00:00Z"
   },
   {
     "id": 11,
     "title": "2024학년도 정시 생기부",
     "targetSchool": "서울대학교",
     "targetMajor": "경영학과",
-    "status": "ANALYZING",
-    "createdAt": "2024-05-21T09:00:00Z",
-    "analyzedAt": null
+    "interviewType": "정시",
+    "status": "PENDING",
+    "createdAt": "2024-05-21T09:00:00Z"
   }
 ]
 ```
@@ -376,13 +326,13 @@ Authorization: Bearer {accessToken}
 
 ---
 
-### 2-4. 생기부 분석 요청
+### 2-3. 생기부 상세 조회
 
-등록된 특정 생기부를 바탕으로 AI에게 면접 질문 생성을 요청합니다.
+특정 생기부의 상세 정보를 조회합니다.
 
 **Endpoint**
 ```
-POST /api/records/{recordId}/analyze
+GET /api/records/{recordId}
 ```
 
 **Headers**
@@ -396,22 +346,26 @@ Authorization: Bearer {accessToken}
 **Response**
 ```json
 {
-  "message": "분석이 시작되었습니다.",
-  "recordId": 10,
-  "status": "ANALYZING"
+  "id": 10,
+  "title": "2025학년도 수시 대비 생기부",
+  "targetSchool": "한국대학교",
+  "targetMajor": "컴퓨터공학과",
+  "interviewType": "수시",
+  "status": "READY",
+  "createdAt": "2024-05-20T10:00:00Z"
 }
 ```
 
 **Error Cases**
-- `404 Not Found`: 해당 ID의 생기부 정보를 찾을 수 없습니다.
-- `409 Conflict`: 이미 분석이 완료되었거나 현재 분석이 진행 중인 상태입니다.
-- `500 Internal Server Error`: AI 엔진과의 통신 중 오류가 발생했습니다.
+- `401 Unauthorized`: 인증되지 않은 사용자입니다.
+- `403 Forbidden`: 본인의 생기부만 조회할 수 있습니다.
+- `404 Not Found`: 존재하지 않는 생기부 ID입니다.
 
 ---
 
-### 2-5. 생기부 삭제
+### 2-4. 생기부 삭제
 
-등록된 생기부 정보와 S3의 실제 파일, 그리고 해당 생기부로 생성된 모든 질문 및 면접 이력을 삭제합니다.
+등록된 생기부 정보와 S3의 실제 파일을 삭제합니다.
 
 **Endpoint**
 ```
@@ -429,17 +383,16 @@ Authorization: Bearer {accessToken}
 **Response**
 ```json
 {
-  "message": "생기부가 삭제되었습니다.",
-  "recordId": 10
+  "message": "생기부가 삭제되었습니다."
 }
 ```
 
 **Error Cases**
+- `401 Unauthorized`: 인증되지 않은 사용자입니다.
 - `403 Forbidden`: 본인의 생기부만 삭제할 수 있습니다.
 - `404 Not Found`: 존재하지 않는 생기부 ID입니다.
 
 **주의사항**
-- Cascade 삭제로 연관된 질문, 즐겨찾기, 면접 세션도 모두 삭제됩니다.
 - S3의 실제 파일도 함께 삭제됩니다.
 
 ---
