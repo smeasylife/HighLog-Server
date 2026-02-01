@@ -35,7 +35,7 @@ public class BookmarkService {
     }
 
     public List<BookmarkResponse> getBookmarks(Long userId) {
-        List<Question> bookmarkedQuestions = questionRepository.findBookmarkedByUserId(userId);
+        List<Question> bookmarkedQuestions = questionRepository.findBookmarkedQuestionsByUserId(userId);
 
         return bookmarkedQuestions.stream()
                 .map(BookmarkResponse::from)
