@@ -2,6 +2,7 @@ package goatHeaven.highLog.service;
 
 import goatHeaven.highLog.domain.*;
 import goatHeaven.highLog.dto.response.QuestionResponse;
+import goatHeaven.highLog.enums.RecordStatus;
 import goatHeaven.highLog.exception.CustomException;
 import goatHeaven.highLog.exception.ErrorCode;
 import goatHeaven.highLog.repository.QuestionRepository;

@@ -1,6 +1,6 @@
 package goatHeaven.highLog.repository;
 
-import goatHeaven.highLog.domain.RecordStatus;
+import goatHeaven.highLog.enums.RecordStatus;
 import goatHeaven.highLog.domain.StudentRecord;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;

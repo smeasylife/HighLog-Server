@@ -1,7 +1,7 @@
 package goatHeaven.highLog.service;
 
 import goatHeaven.highLog.domain.Question;
-import goatHeaven.highLog.domain.RecordStatus;
+import goatHeaven.highLog.enums.RecordStatus;
 import goatHeaven.highLog.domain.StudentRecord;
 import goatHeaven.highLog.dto.response.QuestionResponse;
 import goatHeaven.highLog.exception.CustomException;
