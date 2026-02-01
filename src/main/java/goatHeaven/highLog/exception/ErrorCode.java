@@ -22,6 +22,14 @@ public enum ErrorCode {
     // User
     USER_NOT_FOUND(HttpStatus.NOT_FOUND, "USER001", "사용자를 찾을 수 없습니다."),
 
+    // Record
+    RECORD_NOT_FOUND(HttpStatus.NOT_FOUND, "RECORD001", "해당 생기부를 찾을 수 없습니다."),
+    RECORD_NOT_READY(HttpStatus.BAD_REQUEST, "RECORD002", "생기부 분석이 완료되지 않았습니다."),
+    RECORD_ACCESS_DENIED(HttpStatus.FORBIDDEN, "RECORD003", "해당 생기부에 접근 권한이 없습니다."),
+
+    // Question
+    QUESTION_NOT_FOUND(HttpStatus.NOT_FOUND, "QUESTION001", "해당 질문을 찾을 수 없습니다."),
+
     // Common
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "COMMON001", "서버 내부 오류가 발생했습니다."),
     INVALID_INPUT_VALUE(HttpStatus.BAD_REQUEST, "COMMON002", "잘못된 입력값입니다.");
