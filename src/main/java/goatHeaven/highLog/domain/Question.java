@@ -64,8 +64,4 @@ public class Question {
     public void toggleBookmark() {
         this.isBookmarked = !this.isBookmarked;
     }
-
-    public void updateBookmark(boolean isBookmarked) {
-        this.isBookmarked = isBookmarked;
-    }
 }
