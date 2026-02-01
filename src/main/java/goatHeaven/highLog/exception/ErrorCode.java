@@ -26,18 +26,13 @@ public enum ErrorCode {
     RECORD_NOT_FOUND(HttpStatus.NOT_FOUND, "RECORD001", "해당 생기부를 찾을 수 없습니다."),
     RECORD_NOT_READY(HttpStatus.BAD_REQUEST, "RECORD002", "생기부 분석이 완료되지 않았습니다."),
     RECORD_ACCESS_DENIED(HttpStatus.FORBIDDEN, "RECORD003", "해당 생기부에 접근 권한이 없습니다."),
+    FORBIDDEN(HttpStatus.FORBIDDEN, "RECORD003", "접근 권한이 없습니다."),
+
 
     // Question
     QUESTION_NOT_FOUND(HttpStatus.NOT_FOUND, "QUESTION001", "해당 질문을 찾을 수 없습니다."),
-
-    // Student Record
-    RECORD_NOT_FOUND(HttpStatus.NOT_FOUND, "RECORD001", "생기부를 찾을 수 없습니다."),
-    RECORD_NOT_READY(HttpStatus.BAD_REQUEST, "RECORD002", "생기부 분석이 완료되지 않았습니다."),
-    FORBIDDEN(HttpStatus.FORBIDDEN, "RECORD003", "접근 권한이 없습니다."),
-
-    // Question
-    QUESTION_NOT_FOUND(HttpStatus.NOT_FOUND, "QUESTION001", "질문을 찾을 수 없습니다."),
     QUESTIONS_ALREADY_EXIST(HttpStatus.CONFLICT, "QUESTION002", "이미 질문이 생성되었습니다."),
+
 
     // AI Service
     AI_SERVICE_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "AI001", "AI 서비스 오류가 발생했습니다."),
@@ -51,6 +46,9 @@ public enum ErrorCode {
     // Notice
     NOTICE_NOT_FOUND(HttpStatus.NOT_FOUND, "NOTICE001", "해당 공지사항을 찾을 수 없습니다."),
     ADMIN_ACCESS_DENIED(HttpStatus.FORBIDDEN, "NOTICE002", "관리자 권한이 필요합니다."),
+
+    // FAQ
+    FAQ_NOT_FOUND(HttpStatus.NOT_FOUND, "FAQ001", "해당 FAQ를 찾을 수 없습니다."),
 
     // Common
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "COMMON001", "서버 내부 오류가 발생했습니다."),
