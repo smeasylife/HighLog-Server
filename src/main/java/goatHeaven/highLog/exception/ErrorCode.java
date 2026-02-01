@@ -48,6 +48,10 @@ public enum ErrorCode {
     S3_PRESIGNED_URL_GENERATION_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "S3003", "Presigned URL 생성에 실패했습니다."),
     S3_FILE_DELETE_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "S3004", "S3 파일 삭제에 실패했습니다."),
 
+    // Notice
+    NOTICE_NOT_FOUND(HttpStatus.NOT_FOUND, "NOTICE001", "해당 공지사항을 찾을 수 없습니다."),
+    ADMIN_ACCESS_DENIED(HttpStatus.FORBIDDEN, "NOTICE002", "관리자 권한이 필요합니다."),
+
     // Common
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "COMMON001", "서버 내부 오류가 발생했습니다."),
     INVALID_INPUT_VALUE(HttpStatus.BAD_REQUEST, "COMMON002", "잘못된 입력값입니다.");
