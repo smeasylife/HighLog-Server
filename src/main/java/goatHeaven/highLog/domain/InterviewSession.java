@@ -37,7 +37,7 @@ public class InterviewSession {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
-    private QuestionDifficulty intensity;
+    private Question.Difficulty intensity;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
@@ -71,7 +71,7 @@ public class InterviewSession {
 
     @Builder
     public InterviewSession(String id, User user, StudentRecord record, String threadId,
-                            QuestionDifficulty intensity, InterviewMode mode, Integer limitTimeSeconds) {
+                            Question.Difficulty intensity, InterviewMode mode, Integer limitTimeSeconds) {
         this.id = id;
         this.user = user;
         this.record = record;

@@ -1,7 +1,6 @@
 package goatHeaven.highLog.service;
 
 import goatHeaven.highLog.domain.Question;
-import goatHeaven.highLog.domain.QuestionDifficulty;
 import goatHeaven.highLog.domain.RecordStatus;
 import goatHeaven.highLog.domain.StudentRecord;
 import goatHeaven.highLog.dto.response.QuestionResponse;
@@ -36,10 +35,10 @@ public class QuestionService {
             throw new CustomException(ErrorCode.RECORD_NOT_READY);
         }
 
-        QuestionDifficulty difficultyEnum = null;
+        Question.Difficulty difficultyEnum = null;
         if (difficulty != null && !difficulty.isBlank()) {
             try {
-                difficultyEnum = QuestionDifficulty.valueOf(difficulty.toUpperCase());
+                difficultyEnum = Question.Difficulty.valueOf(difficulty.toUpperCase());
             } catch (IllegalArgumentException e) {
                 throw new CustomException(ErrorCode.INVALID_INPUT_VALUE);
             }

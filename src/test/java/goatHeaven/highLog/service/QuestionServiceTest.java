@@ -51,8 +51,8 @@ class QuestionServiceTest {
             User user = createUser(TEST_USER_ID);
             StudentRecord record = createRecord(TEST_RECORD_ID, user, RecordStatus.READY);
             List<Question> questions = List.of(
-                    createQuestion(100L, record, "인성", QuestionDifficulty.BASIC, false),
-                    createQuestion(101L, record, "전공적합성", QuestionDifficulty.DEEP, true)
+                    createQuestion(100L, record, "인성", Question.Difficulty.BASIC, false),
+                    createQuestion(101L, record, "전공적합성", Question.Difficulty.DEEP, true)
             );
 
             given(studentRecordRepository.findById(TEST_RECORD_ID)).willReturn(Optional.of(record));
@@ -79,7 +79,7 @@ class QuestionServiceTest {
             User user = createUser(TEST_USER_ID);
             StudentRecord record = createRecord(TEST_RECORD_ID, user, RecordStatus.READY);
             List<Question> questions = List.of(
-                    createQuestion(100L, record, "인성", QuestionDifficulty.BASIC, false)
+                    createQuestion(100L, record, "인성", Question.Difficulty.BASIC, false)
             );
 
             given(studentRecordRepository.findById(TEST_RECORD_ID)).willReturn(Optional.of(record));
@@ -102,11 +102,11 @@ class QuestionServiceTest {
             User user = createUser(TEST_USER_ID);
             StudentRecord record = createRecord(TEST_RECORD_ID, user, RecordStatus.READY);
             List<Question> questions = List.of(
-                    createQuestion(100L, record, "인성", QuestionDifficulty.DEEP, false)
+                    createQuestion(100L, record, "인성", Question.Difficulty.DEEP, false)
             );
 
             given(studentRecordRepository.findById(TEST_RECORD_ID)).willReturn(Optional.of(record));
-            given(questionRepository.findByRecordIdWithFilters(TEST_RECORD_ID, null, QuestionDifficulty.DEEP))
+            given(questionRepository.findByRecordIdWithFilters(TEST_RECORD_ID, null, Question.Difficulty.DEEP))
                     .willReturn(questions);
 
             // when
@@ -115,7 +115,7 @@ class QuestionServiceTest {
 
             // then
             assertThat(responses).hasSize(1);
-            assertThat(responses.get(0).getDifficulty()).isEqualTo(QuestionDifficulty.DEEP);
+            assertThat(responses.get(0).getDifficulty()).isEqualTo(Question.Difficulty.DEEP);
         }
 
         @Test
@@ -211,7 +211,7 @@ class QuestionServiceTest {
     }
 
     private Question createQuestion(Long id, StudentRecord record, String category,
-                                    QuestionDifficulty difficulty, boolean isBookmarked) {
+                                    Question.Difficulty difficulty, boolean isBookmarked) {
         Question question = Question.builder()
                 .record(record)
                 .category(category)

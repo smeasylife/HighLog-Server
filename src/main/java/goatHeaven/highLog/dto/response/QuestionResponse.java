@@ -1,7 +1,6 @@
 package goatHeaven.highLog.dto.response;
 
 import goatHeaven.highLog.domain.Question;
-import goatHeaven.highLog.domain.QuestionDifficulty;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -12,9 +11,11 @@ public class QuestionResponse {
     private Long questionId;
     private String category;
     private String content;
-    private QuestionDifficulty difficulty;
+    private Question.Difficulty difficulty;
     private Boolean isBookmarked;
     private String modelAnswer;
+    private String questionPurpose;
+    private String answerPoints;
 
     public static QuestionResponse from(Question question) {
         return QuestionResponse.builder()
@@ -24,6 +25,8 @@ public class QuestionResponse {
                 .difficulty(question.getDifficulty())
                 .isBookmarked(question.getIsBookmarked())
                 .modelAnswer(question.getModelAnswer())
+                .questionPurpose(question.getQuestionPurpose())
+                .answerPoints(question.getAnswerPoints())
                 .build();
     }
 }

@@ -180,7 +180,7 @@ class BookmarkServiceTest {
                 .record(record)
                 .category("인성")
                 .content("테스트 질문입니다.")
-                .difficulty(QuestionDifficulty.BASIC)
+                .difficulty(Question.Difficulty.BASIC)
                 .modelAnswer("모범 답안입니다.")
                 .build();
         ReflectionTestUtils.setField(question, "id", id);

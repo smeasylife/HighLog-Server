@@ -1,7 +1,6 @@
 package goatHeaven.highLog.dto.response;
 
 import goatHeaven.highLog.domain.Question;
-import goatHeaven.highLog.domain.QuestionDifficulty;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -15,7 +14,7 @@ public class BookmarkResponse {
     private String recordTitle;
     private String category;
     private String content;
-    private QuestionDifficulty difficulty;
+    private Question.Difficulty difficulty;
     private LocalDateTime createdAt;
 
     public static BookmarkResponse from(Question question) {

@@ -34,13 +34,19 @@ public class Question {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
-    private QuestionDifficulty difficulty;
+    private Difficulty difficulty;
 
     @Column(name = "is_bookmarked")
     private Boolean isBookmarked = false;
 
     @Column(name = "model_answer", columnDefinition = "TEXT")
     private String modelAnswer;
+
+    @Column(name = "question_purpose", columnDefinition = "TEXT")
+    private String questionPurpose;
+
+    @Column(name = "answer_points", columnDefinition = "TEXT")
+    private String answerPoints;
 
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
@@ -52,7 +58,7 @@ public class Question {
 
     @Builder
     public Question(StudentRecord record, String category, String content,
-                    QuestionDifficulty difficulty, String modelAnswer) {
+                    Difficulty difficulty, String modelAnswer) {
         this.record = record;
         this.category = category;
         this.content = content;
@@ -63,5 +69,11 @@ public class Question {
 
     public void toggleBookmark() {
         this.isBookmarked = !this.isBookmarked;
+    }
+
+    public enum Difficulty {
+        BASIC,
+        PRESSURE,
+        DEEP
     }
 }
