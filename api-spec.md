@@ -823,6 +823,124 @@ GET /api/faqs
 
 ---
 
+### 5-4. 공지사항 작성 (관리자)
+
+새로운 공지사항을 작성합니다.
+
+**Endpoint**
+```
+POST /api/notices
+```
+
+**Headers**
+```
+Authorization: Bearer {accessToken}
+```
+
+**Request Body**
+```json
+{
+  "title": "서비스 정기 점검 안내",
+  "content": "2024년 5월 21일 오전 2시부터 6시까지 정기 점검이 진행됩니다...",
+  "isPinned": true
+}
+```
+
+**Response**
+```json
+{
+  "id": 3,
+  "title": "서비스 정기 점검 안내",
+  "content": "2024년 5월 21일 오전 2시부터 6시까지 정기 점검이 진행됩니다...",
+  "isPinned": true,
+  "createdAt": "2024-05-22T10:00:00Z",
+  "updatedAt": "2024-05-22T10:00:00Z"
+}
+```
+
+**Error Cases**
+- `401 Unauthorized`: 인증되지 않은 사용자입니다.
+- `403 Forbidden`: 관리자 권한이 필요합니다.
+- `400 Bad Request`: 필수 필드(title, content)가 누락되었습니다.
+
+---
+
+### 5-5. 공지사항 수정 (관리자)
+
+기존 공지사항을 수정합니다.
+
+**Endpoint**
+```
+PUT /api/notices/{id}
+```
+
+**Headers**
+```
+Authorization: Bearer {accessToken}
+```
+
+**Path Parameters**
+- `id`: 공지사항 ID
+
+**Request Body**
+```json
+{
+  "title": "서비스 정기 점검 안내 (수정)",
+  "content": "점검 시간이 변경되었습니다. 오전 3시부터 5시까지 진행됩니다...",
+  "isPinned": false
+}
+```
+
+**Response**
+```json
+{
+  "id": 1,
+  "title": "서비스 정기 점검 안내 (수정)",
+  "content": "점검 시간이 변경되었습니다. 오전 3시부터 5시까지 진행됩니다...",
+  "isPinned": false,
+  "createdAt": "2024-05-20T10:00:00Z",
+  "updatedAt": "2024-05-22T14:30:00Z"
+}
+```
+
+**Error Cases**
+- `401 Unauthorized`: 인증되지 않은 사용자입니다.
+- `403 Forbidden`: 관리자 권한이 필요합니다.
+- `404 Not Found`: 해당 공지사항이 존재하지 않습니다.
+
+---
+
+### 5-6. 공지사항 삭제 (관리자)
+
+공지사항을 삭제합니다.
+
+**Endpoint**
+```
+DELETE /api/notices/{id}
+```
+
+**Headers**
+```
+Authorization: Bearer {accessToken}
+```
+
+**Path Parameters**
+- `id`: 공지사항 ID
+
+**Response**
+```json
+{
+  "message": "공지사항이 삭제되었습니다."
+}
+```
+
+**Error Cases**
+- `401 Unauthorized`: 인증되지 않은 사용자입니다.
+- `403 Forbidden`: 관리자 권한이 필요합니다.
+- `404 Not Found`: 해당 공지사항이 존재하지 않습니다.
+
+---
+
 ## 6. 관리자 API (Admin)
 
 > Thymeleaf 기반 서버 사이드 렌더링으로 구현되고 보안상 제공하지 않습니다.
