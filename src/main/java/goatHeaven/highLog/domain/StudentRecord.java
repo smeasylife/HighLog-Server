@@ -48,6 +48,9 @@ public class StudentRecord {
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
 
+    @Column(name = "analyzed_at")
+    private LocalDateTime analyzedAt;
+
     @PrePersist
     protected void onCreate() {
         this.createdAt = LocalDateTime.now();
@@ -67,6 +70,9 @@ public class StudentRecord {
 
     public void updateStatus(RecordStatus status) {
         this.status = status;
+        if (status == RecordStatus.READY) {
+            this.analyzedAt = LocalDateTime.now();
+        }
     }
 
     public boolean isOwner(Long userId) {

@@ -13,6 +13,12 @@ public interface QuestionRepository extends JpaRepository<Question, Long> {
 
     List<Question> findByRecordId(Long recordId);
 
+    List<Question> findByRecordIdAndCategory(Long recordId, String category);
+
+    List<Question> findByRecordIdAndDifficulty(Long recordId, Question.Difficulty difficulty);
+
+    List<Question> findByRecordIdAndCategoryAndDifficulty(Long recordId, String category, Question.Difficulty difficulty);
+
     @Query("SELECT q FROM Question q WHERE q.record.id = :recordId " +
            "AND (:category IS NULL OR q.category = :category) " +
            "AND (:difficulty IS NULL OR q.difficulty = :difficulty)")

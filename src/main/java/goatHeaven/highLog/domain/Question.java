@@ -1,6 +1,7 @@
 package goatHeaven.highLog.domain;
 
 import jakarta.persistence.*;
+import lombok.AccessLevel;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -78,6 +79,7 @@ public class Question {
 
     public enum Difficulty {
         BASIC,
+        PRESSURE,
         DEEP
     }
 }
