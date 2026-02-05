@@ -392,9 +392,9 @@ Authorization: Bearer {accessToken}
 
 ## 3. 면접 질문 및 보관함 (Questions & Bookmarks)
 
-### 3-1. 질문 세트별 질문 목록 조회
+### 3-1. 생성된 질문 목록 조회
 
-특정 질문 세트에 포함된 모든 질문을 조회합니다.
+특정 질문 세트(대학/전공별 묶음)에 포함된 영역별 예상 질문들을 조회합니다. 질문 생성 완료 후 결과 화면이나 면접 준비 화면에서 사용됩니다.
 
 **Endpoint**
 ```
@@ -441,7 +441,8 @@ GET /api/question-sets/1/questions?category=인성&difficulty=BASIC
 ```
 
 **Error Cases**
-- `404 Not Found`: 해당 질문 세트를 찾을 수 없습니다.
+- **403 Forbidden**: 타인의 질문 세트를 조회하려고 하는 경우.
+- **404 Not Found**: 존재하지 않는 `setId`이거나, 아직 질문 생성이 완료되지 않은 경우.
 
 ---
 
