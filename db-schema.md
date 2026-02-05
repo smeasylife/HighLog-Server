@@ -45,12 +45,8 @@ CREATE TABLE student_records (
     user_id BIGINT NOT NULL,
     title VARCHAR(255) NOT NULL,
     s3_key VARCHAR(512) NOT NULL,
-    target_school VARCHAR(100),
-    target_major VARCHAR(100),
-    interview_type VARCHAR(50),
     status VARCHAR(20) DEFAULT 'PENDING',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    analyzed_at TIMESTAMP,
     CONSTRAINT fk_record_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
@@ -63,38 +59,62 @@ CREATE INDEX idx_records_status ON student_records(status);
 - `user_id`: 소유자 사용자 ID
 - `title`: 생기부 제목 (사용자 입력)
 - `s3_key`: S3 저장 경로 (`users/{userId}/records/{uuid}_filename.pdf`)
-- `target_school`: 목표 대학
-- `target_major`: 목표 전공
-- `interview_type`: 면접 전형 타입 (종합전형, 학생부교과 등)
 - `status`: 분석 상태 (`PENDING`, `ANALYZING`, `READY`, `FAILED`)
 - `created_at`: 생기부 등록 시간
-- `analyzed_at`: AI 분석 완료 시간
 
-### 3. questions (면접 질문)
+### 3. question_sets (질문 세트)
 
-AI가 생성한 면접 예상 질문을 저장합니다.
+사용자가 "질문 생성하기"를 누를 때마다 생성되는 질문 세트입니다. 대학, 전공, 전형 정보가 이 테이블에 저장됩니다.
+
+```sql
+CREATE TABLE question_sets (
+    id BIGSERIAL PRIMARY KEY,
+    record_id BIGINT NOT NULL,
+    target_school VARCHAR(100) NOT NULL,
+    target_major VARCHAR(100) NOT NULL,
+    interview_type VARCHAR(50) NOT NULL,
+    title VARCHAR(100) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_set_record FOREIGN KEY (record_id) REFERENCES student_records(id) ON DELETE CASCADE
+);
+
+CREATE INDEX idx_qsets_record_id ON question_sets(record_id);
+```
+
+**컬럼 설명**
+- `id`: 질문 세트 고유 식별자
+- `record_id`: 연결된 생기부 ID
+- `target_school`: 목표 대학 (예: "한양대")
+- `target_major`: 목표 전공 (예: "컴퓨터학부")
+- `interview_type`: 면접 전형 타입 (예: "학생부종합")
+- `title`: 질문 세트 제목
+- `created_at`: 질문 세트 생성 시간
+
+### 4. questions (면접 질문)
+
+AI가 생성한 면접 예상 질문을 저장합니다. 각 질문은 특정 질문 세트에 속합니다.
 
 ```sql
 CREATE TABLE questions (
     id BIGSERIAL PRIMARY KEY,
-    record_id BIGINT NOT NULL,
+    set_id BIGINT NOT NULL,
     category VARCHAR(50) NOT NULL,
     content TEXT NOT NULL,
     difficulty VARCHAR(20) NOT NULL,
     is_bookmarked BOOLEAN DEFAULT FALSE,
     model_answer TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT fk_question_record FOREIGN KEY (record_id) REFERENCES student_records(id) ON DELETE CASCADE
+    CONSTRAINT fk_question_set FOREIGN KEY (set_id) REFERENCES question_sets(id) ON DELETE CASCADE
 );
 
-CREATE INDEX idx_questions_record_id ON questions(record_id);
+CREATE INDEX idx_questions_set_id ON questions(set_id);
 CREATE INDEX idx_questions_category ON questions(category);
 CREATE INDEX idx_questions_difficulty ON questions(difficulty);
 ```
 
 **컬럼 설명**
 - `id`: 질문 고유 식별자
-- `record_id`: 질문이 생성된 생기부 ID
+- `set_id`: 소속된 질문 세트 ID
 - `category`: 질문 카테고리 (인성, 전공적합성, 의사소통 등)
 - `content`: 질문 내용
 - `difficulty`: 난이도 (`BASIC`, `DEEP`)
@@ -102,7 +122,7 @@ CREATE INDEX idx_questions_difficulty ON questions(difficulty);
 - `created_at`: 질문 생성 시간
 
 
-### 4. interview_sessions (면접 세션)
+### 5. interview_sessions (면접 세션)
 
 실제 면접 연습 세션 정보를 저장합니다.
 
@@ -254,7 +274,7 @@ CREATE TABLE checkpoints (
 ```
 users (1) ────< (N) student_records
   │                       │
-  │                       └──< (N) questions
+  │                       └──< (N) question_sets ───< (N) questions
   │                                   
   │                                   
   │

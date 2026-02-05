@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "questions", indexes = {
-        @Index(name = "idx_questions_record_id", columnList = "record_id"),
+        @Index(name = "idx_questions_set_id", columnList = "set_id"),
         @Index(name = "idx_questions_category", columnList = "category"),
         @Index(name = "idx_questions_difficulty", columnList = "difficulty")
 })
@@ -21,9 +21,9 @@ public class Question {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "record_id", nullable = false)
+    @JoinColumn(name = "set_id", nullable = false)
     @Setter
-    private StudentRecord record;
+    private QuestionSet questionSet;
 
     @Column(nullable = false, length = 50)
     private String category;

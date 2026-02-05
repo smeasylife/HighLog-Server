@@ -11,21 +11,21 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/records")
+@RequestMapping("/api/question-sets")
 @RequiredArgsConstructor
 public class QuestionController {
 
     private final QuestionService questionService;
 
-    @GetMapping("/{recordId}/questions")
+    @GetMapping("/{setId}/questions")
     public ResponseEntity<List<QuestionResponse>> getQuestions(
             @AuthenticationPrincipal CustomUserPrincipal principal,
-            @PathVariable Long recordId,
+            @PathVariable Long setId,
             @RequestParam(required = false) String category,
             @RequestParam(required = false) String difficulty) {
 
-        List<QuestionResponse> questions = questionService.getQuestionsByRecordId(
-                principal.getUserId(), recordId, category, difficulty);
+        List<QuestionResponse> questions = questionService.getQuestionsByQuestionSetId(
+                principal.getUserId(), setId, category, difficulty);
 
         return ResponseEntity.ok(questions);
     }

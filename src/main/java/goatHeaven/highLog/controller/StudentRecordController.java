@@ -3,6 +3,7 @@ package goatHeaven.highLog.controller;
 import goatHeaven.highLog.dto.response.MessageResponse;
 import goatHeaven.highLog.dto.response.PresignedUrlResponse;
 import goatHeaven.highLog.dto.response.StudentRecordResponse;
+import goatHeaven.highLog.dto.response.StudentRecordDetailResponse;
 import goatHeaven.highLog.security.CustomUserPrincipal;
 import goatHeaven.highLog.service.S3Service;
 import goatHeaven.highLog.service.StudentRecordService;
@@ -37,10 +38,10 @@ public class StudentRecordController {
     }
 
     @GetMapping("/{recordId}")
-    public ResponseEntity<StudentRecordResponse> getRecord(
+    public ResponseEntity<StudentRecordDetailResponse> getRecord(
             @PathVariable Long recordId,
             @AuthenticationPrincipal CustomUserPrincipal principal) {
-        StudentRecordResponse response = studentRecordService.getRecord(recordId, principal.getUserId());
+        StudentRecordDetailResponse response = studentRecordService.getRecord(recordId, principal.getUserId());
         return ResponseEntity.ok(response);
     }
 

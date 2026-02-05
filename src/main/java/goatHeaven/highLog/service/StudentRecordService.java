@@ -2,6 +2,7 @@ package goatHeaven.highLog.service;
 
 import goatHeaven.highLog.domain.StudentRecord;
 import goatHeaven.highLog.dto.response.StudentRecordResponse;
+import goatHeaven.highLog.dto.response.StudentRecordDetailResponse;
 import goatHeaven.highLog.exception.CustomException;
 import goatHeaven.highLog.exception.ErrorCode;
 import goatHeaven.highLog.repository.StudentRecordRepository;
@@ -27,7 +28,7 @@ public class StudentRecordService {
                 .toList();
     }
 
-    public StudentRecordResponse getRecord(Long recordId, Long userId) {
+    public StudentRecordDetailResponse getRecord(Long recordId, Long userId) {
         StudentRecord record = studentRecordRepository.findById(recordId)
                 .orElseThrow(() -> new CustomException(ErrorCode.RECORD_NOT_FOUND));
 
@@ -36,7 +37,7 @@ public class StudentRecordService {
             throw new CustomException(ErrorCode.FORBIDDEN);
         }
 
-        return new StudentRecordResponse(record);
+        return new StudentRecordDetailResponse(record);
     }
 
     @Transactional
