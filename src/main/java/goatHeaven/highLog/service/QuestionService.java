@@ -1,13 +1,13 @@
 package goatHeaven.highLog.service;
 
 import goatHeaven.highLog.domain.Question;
-import goatHeaven.highLog.enums.RecordStatus;
-import goatHeaven.highLog.domain.StudentRecord;
+import goatHeaven.highLog.domain.Question;
+import goatHeaven.highLog.domain.QuestionSet;
 import goatHeaven.highLog.dto.response.QuestionResponse;
 import goatHeaven.highLog.exception.CustomException;
 import goatHeaven.highLog.exception.ErrorCode;
 import goatHeaven.highLog.repository.QuestionRepository;
-import goatHeaven.highLog.repository.StudentRecordRepository;
+import goatHeaven.highLog.repository.QuestionSetRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,18 +21,14 @@ import java.util.stream.Collectors;
 public class QuestionService {
 
     private final QuestionRepository questionRepository;
-    private final StudentRecordRepository studentRecordRepository;
+    private final QuestionSetRepository questionSetRepository;
 
-    public List<QuestionResponse> getQuestionsByRecordId(Long userId, Long recordId, String category, String difficulty) {
-        StudentRecord record = studentRecordRepository.findById(recordId)
+    public List<QuestionResponse> getQuestionsByQuestionSetId(Long userId, Long questionSetId, String category, String difficulty) {
+        QuestionSet questionSet = questionSetRepository.findById(questionSetId)
                 .orElseThrow(() -> new CustomException(ErrorCode.RECORD_NOT_FOUND));
 
-        if (!record.getUser().getId().equals(userId)) {
-            throw new CustomException(ErrorCode.RECORD_ACCESS_DENIED);
-        }
-
-        if (record.getStatus() != RecordStatus.READY) {
-            throw new CustomException(ErrorCode.RECORD_NOT_READY);
+        if (!questionSet.isOwner(userId)) {
+            throw new CustomException(ErrorCode.FORBIDDEN);
         }
 
         Question.Difficulty difficultyEnum = null;
@@ -46,7 +42,7 @@ public class QuestionService {
 
         String categoryFilter = (category != null && !category.isBlank()) ? category : null;
 
-        List<Question> questions = questionRepository.findByRecordIdWithFilters(recordId, categoryFilter, difficultyEnum);
+        List<Question> questions = questionRepository.findByQuestionSetIdWithFilters(questionSetId, categoryFilter, difficultyEnum);
 
         return questions.stream()
                 .map(QuestionResponse::from)

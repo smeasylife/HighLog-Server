@@ -25,8 +25,8 @@ public class BookmarkService {
         Question question = questionRepository.findById(questionId)
                 .orElseThrow(() -> new CustomException(ErrorCode.QUESTION_NOT_FOUND));
 
-        if (!question.getRecord().getUser().getId().equals(userId)) {
-            throw new CustomException(ErrorCode.RECORD_ACCESS_DENIED);
+        if (!question.getQuestionSet().getRecord().getUser().getId().equals(userId)) {
+            throw new CustomException(ErrorCode.FORBIDDEN);
         }
 
         question.toggleBookmark();

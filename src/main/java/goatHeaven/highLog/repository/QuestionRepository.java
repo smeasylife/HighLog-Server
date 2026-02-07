@@ -11,26 +11,26 @@ import java.util.List;
 @Repository
 public interface QuestionRepository extends JpaRepository<Question, Long> {
 
-    List<Question> findByRecordId(Long recordId);
+    List<Question> findByQuestionSetId(Long questionSetId);
 
-    List<Question> findByRecordIdAndCategory(Long recordId, String category);
+    List<Question> findByQuestionSetIdAndCategory(Long questionSetId, String category);
 
-    List<Question> findByRecordIdAndDifficulty(Long recordId, Question.Difficulty difficulty);
+    List<Question> findByQuestionSetIdAndDifficulty(Long questionSetId, Question.Difficulty difficulty);
 
-    List<Question> findByRecordIdAndCategoryAndDifficulty(Long recordId, String category, Question.Difficulty difficulty);
+    List<Question> findByQuestionSetIdAndCategoryAndDifficulty(Long questionSetId, String category, Question.Difficulty difficulty);
 
-    @Query("SELECT q FROM Question q WHERE q.record.id = :recordId " +
+    @Query("SELECT q FROM Question q WHERE q.questionSet.id = :questionSetId " +
            "AND (:category IS NULL OR q.category = :category) " +
            "AND (:difficulty IS NULL OR q.difficulty = :difficulty)")
-    List<Question> findByRecordIdWithFilters(
-            @Param("recordId") Long recordId,
+    List<Question> findByQuestionSetIdWithFilters(
+            @Param("questionSetId") Long questionSetId,
             @Param("category") String category,
             @Param("difficulty") Question.Difficulty difficulty
     );
 
-    @Query("SELECT q FROM Question q JOIN FETCH q.record r WHERE r.user.id = :userId " +
+    @Query("SELECT q FROM Question q JOIN FETCH q.questionSet qs JOIN FETCH qs.record r WHERE r.user.id = :userId " +
            "AND q.isBookmarked = true ORDER BY q.createdAt DESC")
     List<Question> findBookmarkedQuestionsByUserId(@Param("userId") Long userId);
 
-    boolean existsByRecordIdAndId(Long recordId, Long questionId);
+    boolean existsByQuestionSetIdAndId(Long questionSetId, Long questionId);
 }

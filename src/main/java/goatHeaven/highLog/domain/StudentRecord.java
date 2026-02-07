@@ -8,6 +8,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "student_records", indexes = {
@@ -32,15 +34,6 @@ public class StudentRecord {
     @Column(name = "s3_key", nullable = false, length = 512)
     private String s3Key;
 
-    @Column(name = "target_school", length = 100)
-    private String targetSchool;
-
-    @Column(name = "target_major", length = 100)
-    private String targetMajor;
-
-    @Column(name = "interview_type", length = 50)
-    private String interviewType;
-
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
     private RecordStatus status = RecordStatus.PENDING;
@@ -48,8 +41,8 @@ public class StudentRecord {
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
 
-    @Column(name = "analyzed_at")
-    private LocalDateTime analyzedAt;
+    @OneToMany(mappedBy = "record", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<QuestionSet> questionSets = new ArrayList<>();
 
     @PrePersist
     protected void onCreate() {
@@ -57,22 +50,15 @@ public class StudentRecord {
     }
 
     @Builder
-    public StudentRecord(User user, String title, String s3Key, String targetSchool,
-                        String targetMajor, String interviewType, RecordStatus status) {
+    public StudentRecord(User user, String title, String s3Key, RecordStatus status) {
         this.user = user;
         this.title = title;
         this.s3Key = s3Key;
-        this.targetSchool = targetSchool;
-        this.targetMajor = targetMajor;
-        this.interviewType = interviewType;
         this.status = status != null ? status : RecordStatus.PENDING;
     }
 
     public void updateStatus(RecordStatus status) {
         this.status = status;
-        if (status == RecordStatus.READY) {
-            this.analyzedAt = LocalDateTime.now();
-        }
     }
 
     public boolean isOwner(Long userId) {

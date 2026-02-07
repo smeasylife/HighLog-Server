@@ -302,21 +302,7 @@ Authorization: Bearer {accessToken}
 [
   {
     "id": 10,
-    "title": "2025학년도 수시 대비 생기부",
-    "targetSchool": "한국대학교",
-    "targetMajor": "컴퓨터공학과",
-    "interviewType": "수시",
-    "status": "READY",
-    "createdAt": "2024-05-20T10:00:00Z"
-  },
-  {
-    "id": 11,
-    "title": "2024학년도 정시 생기부",
-    "targetSchool": "서울대학교",
-    "targetMajor": "경영학과",
-    "interviewType": "정시",
-    "status": "PENDING",
-    "createdAt": "2024-05-21T09:00:00Z"
+    "title": "2025학년도 수시 대비 생기부"
   }
 ]
 ```
@@ -326,9 +312,9 @@ Authorization: Bearer {accessToken}
 
 ---
 
-### 2-3. 생기부 상세 조회
+### 2-3. 특정 생기부 상세 데이터 조회
 
-특정 생기부의 상세 정보를 조회합니다.
+특정 생활기록부의 상세 정보와 해당 생기부를 기반으로 생성된 **모든 질문 세트(대학/전공별 묶음) 목록**을 함께 조회합니다. 생기부 관리 페이지 하단의 '생성된 질문 기록' 섹션을 구성하는 데 사용됩니다.
 
 **Endpoint**
 ```
@@ -348,18 +334,25 @@ Authorization: Bearer {accessToken}
 {
   "id": 10,
   "title": "2025학년도 수시 대비 생기부",
-  "targetSchool": "한국대학교",
-  "targetMajor": "컴퓨터공학과",
-  "interviewType": "수시",
   "status": "READY",
-  "createdAt": "2024-05-20T10:00:00Z"
+  "createdAt": "2024-05-20T10:00:00Z",
+  "questionSets": [
+    {
+      "id": 1,
+      "title": "한양대"
+    },
+    {
+      "id": 2,
+      "title": "건국대"
+    }
+  ]
 }
 ```
 
 **Error Cases**
-- `401 Unauthorized`: 인증되지 않은 사용자입니다.
-- `403 Forbidden`: 본인의 생기부만 조회할 수 있습니다.
-- `404 Not Found`: 존재하지 않는 생기부 ID입니다.
+- **401:** 인증되지 않은 사용자입니다.
+- **403**: 해당 `recordId`가 로그인한 사용자의 소유가 아닌 경우.
+- **404**: 존재하지 않는 생기부 ID를 조회한 경우.
 
 ---
 
@@ -401,11 +394,11 @@ Authorization: Bearer {accessToken}
 
 ### 3-1. 생성된 질문 목록 조회
 
-생기부 분석을 통해 도출된 영역별 예상 질문들을 조회합니다.
+특정 질문 세트(대학/전공별 묶음)에 포함된 영역별 예상 질문들을 조회합니다. 질문 생성 완료 후 결과 화면이나 면접 준비 화면에서 사용됩니다.
 
 **Endpoint**
 ```
-GET /api/records/{recordId}/questions
+GET /api/question-sets/{setId}/questions
 ```
 
 **Headers**
@@ -414,7 +407,7 @@ Authorization: Bearer {accessToken}
 ```
 
 **Path Parameters**
-- `recordId`: 생기부 ID
+- `setId`: 질문 세트 ID
 
 **Query Parameters** (선택)
 - `category`: 카테고리 필터 (예: `인성`, `전공적합성`)
@@ -422,7 +415,7 @@ Authorization: Bearer {accessToken}
 
 **Example Request**
 ```
-GET /api/records/10/questions?category=인성&difficulty=BASIC
+GET /api/question-sets/1/questions?category=인성&difficulty=BASIC
 ```
 
 **Response**
@@ -448,7 +441,8 @@ GET /api/records/10/questions?category=인성&difficulty=BASIC
 ```
 
 **Error Cases**
-- `404 Not Found`: 해당 생기부를 찾을 수 없거나 아직 분석 중입니다.
+- **403 Forbidden**: 타인의 질문 세트를 조회하려고 하는 경우.
+- **404 Not Found**: 존재하지 않는 `setId`이거나, 아직 질문 생성이 완료되지 않은 경우.
 
 ---
 

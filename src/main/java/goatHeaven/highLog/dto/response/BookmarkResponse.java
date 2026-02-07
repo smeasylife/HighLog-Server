@@ -20,7 +20,7 @@ public class BookmarkResponse {
     public static BookmarkResponse from(Question question) {
         return BookmarkResponse.builder()
                 .questionId(question.getId())
-                .recordTitle(question.getRecord().getTitle())
+                .recordTitle(question.getQuestionSet().getRecord().getTitle())
                 .category(question.getCategory())
                 .content(question.getContent())
                 .difficulty(question.getDifficulty())
