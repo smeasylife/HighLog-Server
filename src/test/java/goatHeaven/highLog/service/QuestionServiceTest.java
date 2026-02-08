@@ -1,12 +1,16 @@
 package goatHeaven.highLog.service;
 
-import goatHeaven.highLog.domain.*;
+import goatHeaven.highLog.domain.Question;
+import goatHeaven.highLog.domain.QuestionSet;
+import goatHeaven.highLog.domain.Role;
+import goatHeaven.highLog.domain.StudentRecord;
+import goatHeaven.highLog.domain.User;
 import goatHeaven.highLog.dto.response.QuestionResponse;
 import goatHeaven.highLog.enums.RecordStatus;
 import goatHeaven.highLog.exception.CustomException;
 import goatHeaven.highLog.exception.ErrorCode;
 import goatHeaven.highLog.repository.QuestionRepository;
-import goatHeaven.highLog.repository.StudentRecordRepository;
+import goatHeaven.highLog.repository.QuestionSetRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -35,34 +39,36 @@ class QuestionServiceTest {
     private QuestionRepository questionRepository;
 
     @Mock
-    private StudentRecordRepository studentRecordRepository;
+    private QuestionSetRepository questionSetRepository;
 
     private static final Long TEST_USER_ID = 1L;
     private static final Long TEST_RECORD_ID = 10L;
+    private static final Long TEST_QUESTION_SET_ID = 20L;
     private static final Long TEST_QUESTION_ID = 100L;
 
     @Nested
-    @DisplayName("getQuestionsByRecordId 메서드")
-    class GetQuestionsByRecordIdTest {
+    @DisplayName("getQuestionsByQuestionSetId 메서드")
+    class GetQuestionsByQuestionSetIdTest {
 
         @Test
         @DisplayName("성공 - 필터 없이 전체 질문 조회")
         void getQuestions_Success_NoFilter() {
             // given
             User user = createUser(TEST_USER_ID);
-            StudentRecord record = createRecord(TEST_RECORD_ID, user, RecordStatus.READY);
+            StudentRecord record = createRecord(TEST_RECORD_ID, user);
+            QuestionSet questionSet = createQuestionSet(TEST_QUESTION_SET_ID, record);
             List<Question> questions = List.of(
-                    createQuestion(100L, record, "인성", Question.Difficulty.BASIC, false),
-                    createQuestion(101L, record, "전공적합성", Question.Difficulty.DEEP, true)
+                    createQuestion(100L, questionSet, "인성", Question.Difficulty.BASIC, false),
+                    createQuestion(101L, questionSet, "전공적합성", Question.Difficulty.DEEP, true)
             );
 
-            given(studentRecordRepository.findById(TEST_RECORD_ID)).willReturn(Optional.of(record));
-            given(questionRepository.findByRecordIdWithFilters(eq(TEST_RECORD_ID), any(), any()))
+            given(questionSetRepository.findById(TEST_QUESTION_SET_ID)).willReturn(Optional.of(questionSet));
+            given(questionRepository.findByQuestionSetIdWithFilters(eq(TEST_QUESTION_SET_ID), any(), any()))
                     .willReturn(questions);
 
             // when
-            List<QuestionResponse> responses = questionService.getQuestionsByRecordId(
-                    TEST_USER_ID, TEST_RECORD_ID, null, null);
+            List<QuestionResponse> responses = questionService.getQuestionsByQuestionSetId(
+                    TEST_USER_ID, TEST_QUESTION_SET_ID, null, null);
 
             // then
             assertThat(responses).hasSize(2);
@@ -78,18 +84,19 @@ class QuestionServiceTest {
         void getQuestions_Success_WithCategoryFilter() {
             // given
             User user = createUser(TEST_USER_ID);
-            StudentRecord record = createRecord(TEST_RECORD_ID, user, RecordStatus.READY);
+            StudentRecord record = createRecord(TEST_RECORD_ID, user);
+            QuestionSet questionSet = createQuestionSet(TEST_QUESTION_SET_ID, record);
             List<Question> questions = List.of(
-                    createQuestion(100L, record, "인성", Question.Difficulty.BASIC, false)
+                    createQuestion(100L, questionSet, "인성", Question.Difficulty.BASIC, false)
             );
 
-            given(studentRecordRepository.findById(TEST_RECORD_ID)).willReturn(Optional.of(record));
-            given(questionRepository.findByRecordIdWithFilters(TEST_RECORD_ID, "인성", null))
+            given(questionSetRepository.findById(TEST_QUESTION_SET_ID)).willReturn(Optional.of(questionSet));
+            given(questionRepository.findByQuestionSetIdWithFilters(TEST_QUESTION_SET_ID, "인성", null))
                     .willReturn(questions);
 
             // when
-            List<QuestionResponse> responses = questionService.getQuestionsByRecordId(
-                    TEST_USER_ID, TEST_RECORD_ID, "인성", null);
+            List<QuestionResponse> responses = questionService.getQuestionsByQuestionSetId(
+                    TEST_USER_ID, TEST_QUESTION_SET_ID, "인성", null);
 
             // then
             assertThat(responses).hasSize(1);
@@ -101,18 +108,19 @@ class QuestionServiceTest {
         void getQuestions_Success_WithDifficultyFilter() {
             // given
             User user = createUser(TEST_USER_ID);
-            StudentRecord record = createRecord(TEST_RECORD_ID, user, RecordStatus.READY);
+            StudentRecord record = createRecord(TEST_RECORD_ID, user);
+            QuestionSet questionSet = createQuestionSet(TEST_QUESTION_SET_ID, record);
             List<Question> questions = List.of(
-                    createQuestion(100L, record, "인성", Question.Difficulty.DEEP, false)
+                    createQuestion(100L, questionSet, "인성", Question.Difficulty.DEEP, false)
             );
 
-            given(studentRecordRepository.findById(TEST_RECORD_ID)).willReturn(Optional.of(record));
-            given(questionRepository.findByRecordIdWithFilters(TEST_RECORD_ID, null, Question.Difficulty.DEEP))
+            given(questionSetRepository.findById(TEST_QUESTION_SET_ID)).willReturn(Optional.of(questionSet));
+            given(questionRepository.findByQuestionSetIdWithFilters(TEST_QUESTION_SET_ID, null, Question.Difficulty.DEEP))
                     .willReturn(questions);
 
             // when
-            List<QuestionResponse> responses = questionService.getQuestionsByRecordId(
-                    TEST_USER_ID, TEST_RECORD_ID, null, "DEEP");
+            List<QuestionResponse> responses = questionService.getQuestionsByQuestionSetId(
+                    TEST_USER_ID, TEST_QUESTION_SET_ID, null, "DEEP");
 
             // then
             assertThat(responses).hasSize(1);
@@ -120,51 +128,35 @@ class QuestionServiceTest {
         }
 
         @Test
-        @DisplayName("실패 - 생기부를 찾을 수 없음")
-        void getQuestions_RecordNotFound() {
+        @DisplayName("실패 - 질문 세트를 찾을 수 없음")
+        void getQuestions_QuestionSetNotFound() {
             // given
-            given(studentRecordRepository.findById(TEST_RECORD_ID)).willReturn(Optional.empty());
+            given(questionSetRepository.findById(TEST_QUESTION_SET_ID)).willReturn(Optional.empty());
 
             // when & then
-            assertThatThrownBy(() -> questionService.getQuestionsByRecordId(
-                    TEST_USER_ID, TEST_RECORD_ID, null, null))
+            assertThatThrownBy(() -> questionService.getQuestionsByQuestionSetId(
+                    TEST_USER_ID, TEST_QUESTION_SET_ID, null, null))
                     .isInstanceOf(CustomException.class)
                     .satisfies(e -> assertThat(((CustomException) e).getErrorCode())
                             .isEqualTo(ErrorCode.RECORD_NOT_FOUND));
         }
 
         @Test
-        @DisplayName("실패 - 다른 사용자의 생기부에 접근")
+        @DisplayName("실패 - 다른 사용자의 질문 세트에 접근")
         void getQuestions_AccessDenied() {
             // given
             User otherUser = createUser(999L);
-            StudentRecord record = createRecord(TEST_RECORD_ID, otherUser, RecordStatus.READY);
+            StudentRecord record = createRecord(TEST_RECORD_ID, otherUser);
+            QuestionSet questionSet = createQuestionSet(TEST_QUESTION_SET_ID, record);
 
-            given(studentRecordRepository.findById(TEST_RECORD_ID)).willReturn(Optional.of(record));
-
-            // when & then
-            assertThatThrownBy(() -> questionService.getQuestionsByRecordId(
-                    TEST_USER_ID, TEST_RECORD_ID, null, null))
-                    .isInstanceOf(CustomException.class)
-                    .satisfies(e -> assertThat(((CustomException) e).getErrorCode())
-                            .isEqualTo(ErrorCode.RECORD_ACCESS_DENIED));
-        }
-
-        @Test
-        @DisplayName("실패 - 생기부 분석이 완료되지 않음")
-        void getQuestions_RecordNotReady() {
-            // given
-            User user = createUser(TEST_USER_ID);
-            StudentRecord record = createRecord(TEST_RECORD_ID, user, RecordStatus.ANALYZING);
-
-            given(studentRecordRepository.findById(TEST_RECORD_ID)).willReturn(Optional.of(record));
+            given(questionSetRepository.findById(TEST_QUESTION_SET_ID)).willReturn(Optional.of(questionSet));
 
             // when & then
-            assertThatThrownBy(() -> questionService.getQuestionsByRecordId(
-                    TEST_USER_ID, TEST_RECORD_ID, null, null))
+            assertThatThrownBy(() -> questionService.getQuestionsByQuestionSetId(
+                    TEST_USER_ID, TEST_QUESTION_SET_ID, null, null))
                     .isInstanceOf(CustomException.class)
                     .satisfies(e -> assertThat(((CustomException) e).getErrorCode())
-                            .isEqualTo(ErrorCode.RECORD_NOT_READY));
+                            .isEqualTo(ErrorCode.FORBIDDEN));
         }
 
         @Test
@@ -172,13 +164,14 @@ class QuestionServiceTest {
         void getQuestions_InvalidDifficulty() {
             // given
             User user = createUser(TEST_USER_ID);
-            StudentRecord record = createRecord(TEST_RECORD_ID, user, RecordStatus.READY);
+            StudentRecord record = createRecord(TEST_RECORD_ID, user);
+            QuestionSet questionSet = createQuestionSet(TEST_QUESTION_SET_ID, record);
 
-            given(studentRecordRepository.findById(TEST_RECORD_ID)).willReturn(Optional.of(record));
+            given(questionSetRepository.findById(TEST_QUESTION_SET_ID)).willReturn(Optional.of(questionSet));
 
             // when & then
-            assertThatThrownBy(() -> questionService.getQuestionsByRecordId(
-                    TEST_USER_ID, TEST_RECORD_ID, null, "INVALID"))
+            assertThatThrownBy(() -> questionService.getQuestionsByQuestionSetId(
+                    TEST_USER_ID, TEST_QUESTION_SET_ID, null, "INVALID"))
                     .isInstanceOf(CustomException.class)
                     .satisfies(e -> assertThat(((CustomException) e).getErrorCode())
                             .isEqualTo(ErrorCode.INVALID_INPUT_VALUE));
@@ -197,29 +190,38 @@ class QuestionServiceTest {
         return user;
     }
 
-    private StudentRecord createRecord(Long id, User user, RecordStatus status) {
+    private StudentRecord createRecord(Long id, User user) {
         StudentRecord record = StudentRecord.builder()
                 .user(user)
                 .title("2025학년도 생기부")
                 .s3Key("users/1/records/test.pdf")
-                .targetSchool("한국대학교")
-                .targetMajor("컴퓨터공학과")
-                .interviewType("종합전형")
-                .status(status)
+                .status(RecordStatus.READY)
                 .build();
         ReflectionTestUtils.setField(record, "id", id);
         return record;
     }
 
-    private Question createQuestion(Long id, StudentRecord record, String category,
+    private QuestionSet createQuestionSet(Long id, StudentRecord record) {
+        QuestionSet questionSet = QuestionSet.builder()
+                .record(record)
+                .targetSchool("서울대학교")
+                .targetMajor("컴퓨터공학부")
+                .interviewType("학생부종합전형")
+                .title("서울대 컴공")
+                .build();
+        ReflectionTestUtils.setField(questionSet, "id", id);
+        return questionSet;
+    }
+
+    private Question createQuestion(Long id, QuestionSet questionSet, String category,
                                     Question.Difficulty difficulty, boolean isBookmarked) {
         Question question = Question.builder()
-                .record(record)
                 .category(category)
                 .content("테스트 질문입니다.")
                 .difficulty(difficulty)
                 .modelAnswer("모범 답안입니다.")
                 .build();
+        question.setQuestionSet(questionSet);
         ReflectionTestUtils.setField(question, "id", id);
         ReflectionTestUtils.setField(question, "isBookmarked", isBookmarked);
         return question;

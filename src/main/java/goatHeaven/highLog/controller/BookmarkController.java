@@ -33,9 +33,10 @@ public class BookmarkController {
 
     @GetMapping
     public ResponseEntity<List<BookmarkResponse>> getBookmarks(
-            @AuthenticationPrincipal CustomUserPrincipal principal) {
+            @AuthenticationPrincipal CustomUserPrincipal principal,
+            @RequestParam(required = false) Long recordId) {
 
-        List<BookmarkResponse> bookmarks = bookmarkService.getBookmarks(principal.getUserId());
+        List<BookmarkResponse> bookmarks = bookmarkService.getBookmarks(principal.getUserId(), recordId);
 
         return ResponseEntity.ok(bookmarks);
     }
