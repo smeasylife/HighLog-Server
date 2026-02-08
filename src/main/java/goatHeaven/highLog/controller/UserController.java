@@ -2,6 +2,7 @@ package goatHeaven.highLog.controller;
 
 import goatHeaven.highLog.dto.request.ChangePasswordRequest;
 import goatHeaven.highLog.dto.request.DeleteAccountRequest;
+import goatHeaven.highLog.dto.response.AccountInfoResponse;
 import goatHeaven.highLog.dto.response.DashboardResponse;
 import goatHeaven.highLog.dto.response.MessageResponse;
 import goatHeaven.highLog.security.CustomUserPrincipal;
@@ -24,6 +25,13 @@ public class UserController {
             @AuthenticationPrincipal CustomUserPrincipal principal) {
 
         return ResponseEntity.ok(userService.getDashboard(principal.getUserId()));
+    }
+
+    @GetMapping("/accountInfo")
+    public ResponseEntity<AccountInfoResponse> getAccountInfo(
+            @AuthenticationPrincipal CustomUserPrincipal principal) {
+
+        return ResponseEntity.ok(userService.getAccountInfo(principal.getUserId()));
     }
 
     @PatchMapping("/password")

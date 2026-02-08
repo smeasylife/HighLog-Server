@@ -4,6 +4,7 @@ import goatHeaven.highLog.domain.StudentRecord;
 import goatHeaven.highLog.domain.User;
 import goatHeaven.highLog.dto.request.ChangePasswordRequest;
 import goatHeaven.highLog.dto.request.DeleteAccountRequest;
+import goatHeaven.highLog.dto.response.AccountInfoResponse;
 import goatHeaven.highLog.dto.response.DashboardResponse;
 import goatHeaven.highLog.dto.response.MessageResponse;
 import goatHeaven.highLog.exception.CustomException;
@@ -48,6 +49,15 @@ public class UserService {
         int questionBookmarkCnt = questionRepository.countBookmarkedQuestionsByUserId(userId);
 
         return DashboardResponse.of(user.getName(), registDate, questionBookmarkCnt);
+    }
+
+    public AccountInfoResponse getAccountInfo(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+
+        String registDate = user.getCreatedAt().format(DATE_FORMATTER);
+
+        return AccountInfoResponse.of(user.getName(), registDate, user.getEmail());
     }
 
     @Transactional
