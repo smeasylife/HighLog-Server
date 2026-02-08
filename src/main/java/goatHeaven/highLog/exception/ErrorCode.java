@@ -21,6 +21,7 @@ public enum ErrorCode {
 
     // User
     USER_NOT_FOUND(HttpStatus.NOT_FOUND, "USER001", "사용자를 찾을 수 없습니다."),
+    PASSWORD_MISMATCH(HttpStatus.UNAUTHORIZED, "USER002", "비밀번호가 일치하지 않습니다."),
 
     // Record
     RECORD_NOT_FOUND(HttpStatus.NOT_FOUND, "RECORD001", "해당 생기부를 찾을 수 없습니다."),

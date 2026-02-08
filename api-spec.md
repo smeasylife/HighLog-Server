@@ -820,3 +820,137 @@ GET /api/faqs
 ## 6. 관리자 API (Admin)
 
 > Thymeleaf 기반 서버 사이드 렌더링으로 구현되고 보안상 제공하지 않습니다.
+ 
+ 
+---
+
+## 7. 마이페이지
+
+### 7-1. 대시보드
+
+**Endpoint**
+```
+GET /api/users/me/dashboard
+```
+
+**Response**
+```json
+{
+  "userName": "길동",
+  "registDate": "20260118",  
+  "questionBookmarkCnt": 24,
+  "interviewSessionCnt": 3,
+  "interviewResponseAvg": 0
+}
+```
+
+---
+
+### 7-2. 계정정보
+
+**Endpoint**
+```
+GET /api/users/me/accountInfo
+```
+
+**Response**
+```json
+{
+  "userName": "길동",
+  "registDate": "20260118",  
+  "email": "Honggildong@Example.Com"
+}
+```
+
+---
+
+### 7-3. 설정
+
+**Endpoint**
+```
+GET /api/users/me/setting
+```
+
+**Response**
+```json
+{
+  "responseAutoSave": true
+}
+```
+
+---
+
+### 7-4. 비밀번호 변경
+
+현재 비밀번호를 확인한 후 새 비밀번호로 변경합니다.
+
+**Endpoint**
+```
+PATCH /api/users/me/password
+```
+
+**Headers**
+```
+Authorization: Bearer {accessToken}
+```
+
+**Request Body**
+```json
+{
+  "currentPassword": "CurrentPassword123!",
+  "newPassword": "NewPassword456!"
+}
+```
+
+**Response**
+```json
+{
+  "message": "비밀번호가 변경되었습니다."
+}
+```
+
+**Error Cases**
+- `400 Bad Request`: 새 비밀번호가 정책에 맞지 않습니다.
+- `401 Unauthorized`: 현재 비밀번호가 일치하지 않습니다.
+
+**비밀번호 정책**
+- 최소 8자 이상
+- 영문 대소문자, 숫자, 특수문자 조합
+
+---
+
+### 7-5. 회원탈퇴
+
+본인 확인 후 계정을 삭제합니다. 관련된 모든 데이터(생기부, 질문, 면접 기록 등)가 함께 삭제됩니다.
+
+**Endpoint**
+```
+DELETE /api/users/me
+```
+
+**Headers**
+```
+Authorization: Bearer {accessToken}
+```
+
+**Request Body**
+```json
+{
+  "password": "CurrentPassword123!"
+}
+```
+
+**Response**
+```json
+{
+  "message": "회원 탈퇴가 완료되었습니다."
+}
+```
+
+**Error Cases**
+- `401 Unauthorized`: 비밀번호가 일치하지 않습니다.
+
+**주의사항**
+- 탈퇴 시 S3에 저장된 생기부 PDF 파일도 함께 삭제됩니다.
+- Redis에 저장된 인증 토큰도 삭제됩니다.
+- 삭제된 데이터는 복구할 수 없습니다. 
