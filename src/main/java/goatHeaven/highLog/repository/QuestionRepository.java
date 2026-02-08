@@ -32,5 +32,9 @@ public interface QuestionRepository extends JpaRepository<Question, Long> {
            "AND q.isBookmarked = true ORDER BY q.createdAt DESC")
     List<Question> findBookmarkedQuestionsByUserId(@Param("userId") Long userId);
 
+    @Query("SELECT q FROM Question q JOIN FETCH q.questionSet qs JOIN FETCH qs.record r WHERE r.user.id = :userId " +
+           "AND r.id = :recordId AND q.isBookmarked = true ORDER BY q.createdAt DESC")
+    List<Question> findBookmarkedQuestionsByUserIdAndRecordId(@Param("userId") Long userId, @Param("recordId") Long recordId);
+
     boolean existsByQuestionSetIdAndId(Long questionSetId, Long questionId);
 }

@@ -34,8 +34,14 @@ public class BookmarkService {
         return BookmarkToggleResponse.of(questionId, question.getIsBookmarked());
     }
 
-    public List<BookmarkResponse> getBookmarks(Long userId) {
-        List<Question> bookmarkedQuestions = questionRepository.findBookmarkedQuestionsByUserId(userId);
+    public List<BookmarkResponse> getBookmarks(Long userId, Long recordId) {
+        List<Question> bookmarkedQuestions;
+
+        if (recordId != null) {
+            bookmarkedQuestions = questionRepository.findBookmarkedQuestionsByUserIdAndRecordId(userId, recordId);
+        } else {
+            bookmarkedQuestions = questionRepository.findBookmarkedQuestionsByUserId(userId);
+        }
 
         return bookmarkedQuestions.stream()
                 .map(BookmarkResponse::from)

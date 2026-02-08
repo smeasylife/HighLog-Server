@@ -62,7 +62,6 @@ public class Question {
     public Question(StudentRecord record, String category, String content,
                    Difficulty difficulty, String modelAnswer, String modelAnswerCriteria,
                    String questionPurpose, String answerPoints) {
-        this.record = record;
         this.category = category;
         this.content = content;
         this.difficulty = difficulty;
