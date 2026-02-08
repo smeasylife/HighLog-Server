@@ -37,4 +37,7 @@ public interface QuestionRepository extends JpaRepository<Question, Long> {
     List<Question> findBookmarkedQuestionsByUserIdAndRecordId(@Param("userId") Long userId, @Param("recordId") Long recordId);
 
     boolean existsByQuestionSetIdAndId(Long questionSetId, Long questionId);
+
+    @Query("SELECT COUNT(q) FROM Question q JOIN q.questionSet qs JOIN qs.record r WHERE r.user.id = :userId AND q.isBookmarked = true")
+    int countBookmarkedQuestionsByUserId(@Param("userId") Long userId);
 }

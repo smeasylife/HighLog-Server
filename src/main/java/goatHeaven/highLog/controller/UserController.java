@@ -2,6 +2,7 @@ package goatHeaven.highLog.controller;
 
 import goatHeaven.highLog.dto.request.ChangePasswordRequest;
 import goatHeaven.highLog.dto.request.DeleteAccountRequest;
+import goatHeaven.highLog.dto.response.DashboardResponse;
 import goatHeaven.highLog.dto.response.MessageResponse;
 import goatHeaven.highLog.security.CustomUserPrincipal;
 import goatHeaven.highLog.service.UserService;
@@ -17,6 +18,13 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
 
     private final UserService userService;
+
+    @GetMapping("/dashboard")
+    public ResponseEntity<DashboardResponse> getDashboard(
+            @AuthenticationPrincipal CustomUserPrincipal principal) {
+
+        return ResponseEntity.ok(userService.getDashboard(principal.getUserId()));
+    }
 
     @PatchMapping("/password")
     public ResponseEntity<MessageResponse> changePassword(

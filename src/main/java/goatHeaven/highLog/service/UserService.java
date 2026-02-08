@@ -4,9 +4,11 @@ import goatHeaven.highLog.domain.StudentRecord;
 import goatHeaven.highLog.domain.User;
 import goatHeaven.highLog.dto.request.ChangePasswordRequest;
 import goatHeaven.highLog.dto.request.DeleteAccountRequest;
+import goatHeaven.highLog.dto.response.DashboardResponse;
 import goatHeaven.highLog.dto.response.MessageResponse;
 import goatHeaven.highLog.exception.CustomException;
 import goatHeaven.highLog.exception.ErrorCode;
+import goatHeaven.highLog.repository.QuestionRepository;
 import goatHeaven.highLog.repository.StudentRecordRepository;
 import goatHeaven.highLog.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -15,6 +17,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -26,13 +29,26 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final StudentRecordRepository studentRecordRepository;
+    private final QuestionRepository questionRepository;
     private final RedisService redisService;
     private final S3Service s3Service;
     private final PasswordEncoder passwordEncoder;
 
+    private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyyMMdd");
+
     private static final Pattern PASSWORD_PATTERN = Pattern.compile(
             "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,}$"
     );
+
+    public DashboardResponse getDashboard(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+
+        String registDate = user.getCreatedAt().format(DATE_FORMATTER);
+        int questionBookmarkCnt = questionRepository.countBookmarkedQuestionsByUserId(userId);
+
+        return DashboardResponse.of(user.getName(), registDate, questionBookmarkCnt);
+    }
 
     @Transactional
     public MessageResponse changePassword(Long userId, ChangePasswordRequest request) {

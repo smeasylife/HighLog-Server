@@ -828,6 +828,8 @@ GET /api/faqs
 
 ### 7-1. 대시보드
 
+회원의 기본적인 정보를 조회합니다.
+
 **Endpoint**
 ```
 GET /api/users/me/dashboard
@@ -847,6 +849,8 @@ GET /api/users/me/dashboard
 ---
 
 ### 7-2. 계정정보
+
+회원의 기본적인 계정 정보를 조회합니다.
 
 **Endpoint**
 ```
