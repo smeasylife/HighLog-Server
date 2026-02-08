@@ -2,11 +2,11 @@ package goatHeaven.highLog.service;
 
 import goatHeaven.highLog.domain.Question;
 import goatHeaven.highLog.domain.QuestionSet;
-import goatHeaven.highLog.domain.RecordStatus;
 import goatHeaven.highLog.domain.StudentRecord;
 import goatHeaven.highLog.domain.User;
 import goatHeaven.highLog.dto.response.BookmarkResponse;
 import goatHeaven.highLog.dto.response.BookmarkToggleResponse;
+import goatHeaven.highLog.enums.RecordStatus;
 import goatHeaven.highLog.exception.CustomException;
 import goatHeaven.highLog.exception.ErrorCode;
 import goatHeaven.highLog.repository.QuestionRepository;
@@ -108,7 +108,7 @@ class BookmarkServiceTest {
             assertThatThrownBy(() -> bookmarkService.toggleBookmark(TEST_USER_ID, TEST_QUESTION_ID))
                     .isInstanceOf(CustomException.class)
                     .satisfies(e -> assertThat(((CustomException) e).getErrorCode())
-                            .isEqualTo(ErrorCode.RECORD_ACCESS_DENIED));
+                            .isEqualTo(ErrorCode.FORBIDDEN));
         }
     }
 
@@ -192,9 +192,6 @@ class BookmarkServiceTest {
                 .user(user)
                 .title("2025학년도 생기부")
                 .s3Key("users/1/records/test.pdf")
-                .targetSchool("한국대학교")
-                .targetMajor("컴퓨터공학과")
-                .interviewType("종합전형")
                 .status(RecordStatus.READY)
                 .build();
         ReflectionTestUtils.setField(record, "id", id);
