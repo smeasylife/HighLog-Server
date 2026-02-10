@@ -1,8 +1,12 @@
 package goatHeaven.highLog.service;
 
-import goatHeaven.highLog.domain.*;
+import goatHeaven.highLog.domain.Question;
+import goatHeaven.highLog.domain.QuestionSet;
+import goatHeaven.highLog.domain.StudentRecord;
+import goatHeaven.highLog.domain.User;
 import goatHeaven.highLog.dto.response.BookmarkResponse;
 import goatHeaven.highLog.dto.response.BookmarkToggleResponse;
+import goatHeaven.highLog.enums.RecordStatus;
 import goatHeaven.highLog.exception.CustomException;
 import goatHeaven.highLog.exception.ErrorCode;
 import goatHeaven.highLog.repository.QuestionRepository;
@@ -104,7 +108,7 @@ class BookmarkServiceTest {
             assertThatThrownBy(() -> bookmarkService.toggleBookmark(TEST_USER_ID, TEST_QUESTION_ID))
                     .isInstanceOf(CustomException.class)
                     .satisfies(e -> assertThat(((CustomException) e).getErrorCode())
-                            .isEqualTo(ErrorCode.RECORD_ACCESS_DENIED));
+                            .isEqualTo(ErrorCode.FORBIDDEN));
         }
     }
 
@@ -113,7 +117,7 @@ class BookmarkServiceTest {
     class GetBookmarksTest {
 
         @Test
-        @DisplayName("성공 - 북마크된 질문 목록 조회")
+        @DisplayName("성공 - 전체 북마크된 질문 목록 조회 (recordId 없음)")
         void getBookmarks_Success() {
             // given
             User user = createUser(TEST_USER_ID);
@@ -123,10 +127,10 @@ class BookmarkServiceTest {
                     createQuestion(101L, record, true)
             );
 
-            given(questionRepository.findBookmarkedByUserId(TEST_USER_ID)).willReturn(bookmarkedQuestions);
+            given(questionRepository.findBookmarkedQuestionsByUserId(TEST_USER_ID)).willReturn(bookmarkedQuestions);
 
             // when
-            List<BookmarkResponse> responses = bookmarkService.getBookmarks(TEST_USER_ID);
+            List<BookmarkResponse> responses = bookmarkService.getBookmarks(TEST_USER_ID, null);
 
             // then
             assertThat(responses).hasSize(2);
@@ -136,13 +140,35 @@ class BookmarkServiceTest {
         }
 
         @Test
+        @DisplayName("성공 - 특정 생기부의 북마크된 질문 목록 조회 (recordId 있음)")
+        void getBookmarks_ByRecordId_Success() {
+            // given
+            User user = createUser(TEST_USER_ID);
+            StudentRecord record = createRecord(TEST_RECORD_ID, user);
+            List<Question> bookmarkedQuestions = List.of(
+                    createQuestion(100L, record, true)
+            );
+
+            given(questionRepository.findBookmarkedQuestionsByUserIdAndRecordId(TEST_USER_ID, TEST_RECORD_ID))
+                    .willReturn(bookmarkedQuestions);
+
+            // when
+            List<BookmarkResponse> responses = bookmarkService.getBookmarks(TEST_USER_ID, TEST_RECORD_ID);
+
+            // then
+            assertThat(responses).hasSize(1);
+            assertThat(responses.get(0).getQuestionId()).isEqualTo(100L);
+            assertThat(responses.get(0).getRecordTitle()).isEqualTo("2025학년도 생기부");
+        }
+
+        @Test
         @DisplayName("성공 - 북마크된 질문이 없는 경우 빈 리스트 반환")
         void getBookmarks_Empty() {
             // given
-            given(questionRepository.findBookmarkedByUserId(TEST_USER_ID)).willReturn(List.of());
+            given(questionRepository.findBookmarkedQuestionsByUserId(TEST_USER_ID)).willReturn(List.of());
 
             // when
-            List<BookmarkResponse> responses = bookmarkService.getBookmarks(TEST_USER_ID);
+            List<BookmarkResponse> responses = bookmarkService.getBookmarks(TEST_USER_ID, null);
 
             // then
             assertThat(responses).isEmpty();
@@ -166,23 +192,33 @@ class BookmarkServiceTest {
                 .user(user)
                 .title("2025학년도 생기부")
                 .s3Key("users/1/records/test.pdf")
-                .targetSchool("한국대학교")
-                .targetMajor("컴퓨터공학과")
-                .interviewType("종합전형")
                 .status(RecordStatus.READY)
                 .build();
         ReflectionTestUtils.setField(record, "id", id);
         return record;
     }
 
-    private Question createQuestion(Long id, StudentRecord record, boolean isBookmarked) {
-        Question question = Question.builder()
+    private QuestionSet createQuestionSet(Long id, StudentRecord record) {
+        QuestionSet questionSet = QuestionSet.builder()
                 .record(record)
+                .targetSchool("한국대학교")
+                .targetMajor("컴퓨터공학과")
+                .interviewType("종합전형")
+                .title("테스트 질문 세트")
+                .build();
+        ReflectionTestUtils.setField(questionSet, "id", id);
+        return questionSet;
+    }
+
+    private Question createQuestion(Long id, StudentRecord record, boolean isBookmarked) {
+        QuestionSet questionSet = createQuestionSet(id + 1000, record);
+        Question question = Question.builder()
                 .category("인성")
                 .content("테스트 질문입니다.")
                 .difficulty(Question.Difficulty.BASIC)
                 .modelAnswer("모범 답안입니다.")
                 .build();
+        question.setQuestionSet(questionSet);
         ReflectionTestUtils.setField(question, "id", id);
         ReflectionTestUtils.setField(question, "isBookmarked", isBookmarked);
         return question;
