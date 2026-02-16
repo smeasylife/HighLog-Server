@@ -1,1 +1,3 @@
 rootProject.name = 'highLog'
+
+include 'jOOQ-custom'

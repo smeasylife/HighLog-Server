@@ -1,7 +1,14 @@
+buildscript{
+	ext {
+		jooqVersion = '3.20.11'
+	}
+}
+
 plugins {
 	id 'java'
 	id 'org.springframework.boot' version '4.0.1'
 	id 'io.spring.dependency-management' version '1.1.7'
+	id 'nu.studer.jooq' version '10.0'
 }
 
 group = 'goatHeaven'
@@ -59,8 +66,80 @@ dependencies {
 	testImplementation 'org.springframework.boot:spring-boot-starter-webmvc-test'
 	implementation 'me.paulschwarz:spring-dotenv:4.0.0'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+	implementation ('org.springframework.boot:spring-boot-starter-jooq'){
+		exclude group: 'org.jooq:jooq'
+	}
+
+	implementation "org.jooq:jooq:${jooqVersion}"
+	testImplementation 'org.springframework.boot:spring-boot-starter-jooq-test'
+
+	jooqGenerator project(':jOOQ-custom')
+	jooqGenerator "org.jooq:jooq:${jooqVersion}"
+	jooqGenerator "org.jooq:jooq-meta:${jooqVersion}"
 }
+
+jooq {
+	version = "${jooqVersion}"
+
+	configurations {
+		highLogDb {
+			generationTool {
+
+				//db 접속정보
+				jdbc {
+					driver = 'org.postgresql.Driver'
+					url = 'jdbc:postgresql://localhost:5432/highlog'
+					user = 'postgres'
+					password = 'wlalsdl0228'
+				}
+
+				generator {
+					name = 'org.jooq.codegen.DefaultGenerator'
+
+					database {
+						name = 'org.jooq.meta.postgres.PostgresDatabase'
+
+						schemata {
+							schema {
+								inputSchema = 'public'
+							}
+						}
+					}
+
+					generate {
+						daos = true
+						records = true
+						fluentSetters = true
+						javaTimeTypes = true
+						deprecated = false
+					}
+					target {
+						packageName = 'goatHeaven.highLog.jooq'
+						directory = 'src/generated'
+					}
+
+					strategy.name = 'jooq.custom.generator.JPrefixGeneratorStrategy'
+				}
+			}
+		}
+	}
+
+}
+
+sourceSets {
+	main {
+		java {
+			srcDirs = ["src/main/java", "src/generated"]
+		}
+	}
+}
+
 
 tasks.named('test') {
 	useJUnitPlatform()
+}
+
+tasks.named('generateHighLogDbJooq') {
+	dependsOn tasks.named('compileJava')
 }
