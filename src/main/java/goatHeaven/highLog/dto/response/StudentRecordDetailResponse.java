@@ -1,7 +1,7 @@
 package goatHeaven.highLog.dto.response;
 
-import goatHeaven.highLog.domain.StudentRecord;
-import goatHeaven.highLog.domain.QuestionSet;
+import goatHeaven.highLog.jooq.tables.pojos.StudentRecords;
+import goatHeaven.highLog.jooq.tables.pojos.QuestionSets;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
@@ -17,12 +17,12 @@ public class StudentRecordDetailResponse {
     private final LocalDateTime createdAt;
     private final List<QuestionSetSummary> questionSets;
 
-    public StudentRecordDetailResponse(StudentRecord record) {
+    public StudentRecordDetailResponse(StudentRecords record, List<QuestionSets> questionSets) {
         this.id = record.getId();
         this.title = record.getTitle();
-        this.status = record.getStatus().name();
+        this.status = record.getStatus();
         this.createdAt = record.getCreatedAt();
-        this.questionSets = record.getQuestionSets().stream()
+        this.questionSets = questionSets.stream()
                 .map(QuestionSetSummary::new)
                 .collect(Collectors.toList());
     }
@@ -32,7 +32,7 @@ public class StudentRecordDetailResponse {
         private final Long id;
         private final String title;
 
-        public QuestionSetSummary(QuestionSet questionSet) {
+        public QuestionSetSummary(QuestionSets questionSet) {
             this.id = questionSet.getId();
             this.title = questionSet.getTitle();
         }

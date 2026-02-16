@@ -1,6 +1,6 @@
 package goatHeaven.highLog.dto.response;
 
-import goatHeaven.highLog.domain.User;
+import goatHeaven.highLog.jooq.tables.pojos.Users;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -20,7 +20,7 @@ public class LoginResponse {
         private String name;
     }
 
-    public static LoginResponse of(String accessToken, String refreshToken, User user) {
+    public static LoginResponse of(String accessToken, String refreshToken, Users user) {
         return LoginResponse.builder()
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)

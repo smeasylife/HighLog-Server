@@ -1,6 +1,7 @@
 package goatHeaven.highLog.service;
 
-import goatHeaven.highLog.domain.StudentRecord;
+import goatHeaven.highLog.jooq.tables.pojos.StudentRecords;
+import goatHeaven.highLog.jooq.tables.pojos.QuestionSets;
 import goatHeaven.highLog.dto.response.StudentRecordResponse;
 import goatHeaven.highLog.dto.response.StudentRecordDetailResponse;
 import goatHeaven.highLog.exception.CustomException;
@@ -29,24 +30,26 @@ public class StudentRecordService {
     }
 
     public StudentRecordDetailResponse getRecord(Long recordId, Long userId) {
-        StudentRecord record = studentRecordRepository.findById(recordId)
+        StudentRecords record = studentRecordRepository.findById(recordId)
                 .orElseThrow(() -> new CustomException(ErrorCode.RECORD_NOT_FOUND));
 
         // 본인의 생기부만 조회 가능
-        if (!record.isOwner(userId)) {
+        if (!record.getUserId().equals(userId)) {
             throw new CustomException(ErrorCode.FORBIDDEN);
         }
 
-        return new StudentRecordDetailResponse(record);
+        List<QuestionSets> questionSets = studentRecordRepository.findQuestionSetsByRecordId(recordId);
+
+        return new StudentRecordDetailResponse(record, questionSets);
     }
 
     @Transactional
     public void deleteRecord(Long recordId, Long userId) {
-        StudentRecord record = studentRecordRepository.findById(recordId)
+        StudentRecords record = studentRecordRepository.findById(recordId)
                 .orElseThrow(() -> new CustomException(ErrorCode.RECORD_NOT_FOUND));
 
         // 본인의 생기부만 삭제 가능
-        if (!record.isOwner(userId)) {
+        if (!record.getUserId().equals(userId)) {
             throw new CustomException(ErrorCode.FORBIDDEN);
         }
 
