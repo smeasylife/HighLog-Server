@@ -14,7 +14,8 @@ public class QuestionResponse {
     private Question.Difficulty difficulty;
     private Boolean isBookmarked;
     private String modelAnswer;
-    private String questionPurpose;
+    private String evaluationCriteria;
+    private String purpose;
     private String answerPoints;
 
     public static QuestionResponse from(Question question) {
@@ -25,7 +26,8 @@ public class QuestionResponse {
                 .difficulty(question.getDifficulty())
                 .isBookmarked(question.getIsBookmarked())
                 .modelAnswer(question.getModelAnswer())
-                .questionPurpose(question.getQuestionPurpose())
+                .evaluationCriteria(question.getEvaluationCriteria())
+                .purpose(question.getPurpose())
                 .answerPoints(question.getAnswerPoints())
                 .build();
     }
