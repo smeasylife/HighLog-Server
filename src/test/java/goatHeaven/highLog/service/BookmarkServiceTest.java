@@ -215,8 +215,11 @@ class BookmarkServiceTest {
         Question question = Question.builder()
                 .category("인성")
                 .content("테스트 질문입니다.")
-                .difficulty(Question.Difficulty.BASIC)
+                .difficulty(Question.Difficulty.기본)
                 .modelAnswer("모범 답안입니다.")
+                .evaluationCriteria("평가 기준입니다.")
+                .purpose("질문 목적입니다.")
+                .answerPoints("답변 포인트입니다.")
                 .build();
         question.setQuestionSet(questionSet);
         ReflectionTestUtils.setField(question, "id", id);

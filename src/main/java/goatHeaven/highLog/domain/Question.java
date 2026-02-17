@@ -41,11 +41,11 @@ public class Question {
     @Column(name = "model_answer", columnDefinition = "TEXT")
     private String modelAnswer;
 
-    @Column(name = "model_answer_criteria", columnDefinition = "TEXT")
-    private String modelAnswerCriteria;
+    @Column(name = "evaluation_criteria", columnDefinition = "TEXT")
+    private String evaluationCriteria;
 
-    @Column(name = "question_purpose", columnDefinition = "TEXT")
-    private String questionPurpose;
+    @Column(name = "purpose", columnDefinition = "TEXT")
+    private String purpose;
 
     @Column(name = "answer_points", columnDefinition = "TEXT")
     private String answerPoints;
@@ -60,14 +60,14 @@ public class Question {
 
     @Builder
     public Question(StudentRecord record, String category, String content,
-                   Difficulty difficulty, String modelAnswer, String modelAnswerCriteria,
-                   String questionPurpose, String answerPoints) {
+                   Difficulty difficulty, String modelAnswer, String evaluationCriteria,
+                   String purpose, String answerPoints) {
         this.category = category;
         this.content = content;
         this.difficulty = difficulty;
         this.modelAnswer = modelAnswer;
-        this.modelAnswerCriteria = modelAnswerCriteria;
-        this.questionPurpose = questionPurpose;
+        this.evaluationCriteria = evaluationCriteria;
+        this.purpose = purpose;
         this.answerPoints = answerPoints;
         this.isBookmarked = false;
     }
@@ -77,8 +77,8 @@ public class Question {
     }
 
     public enum Difficulty {
-        BASIC,
-        PRESSURE,
-        DEEP
+        기본,
+        압박,
+        심화
     }
 }

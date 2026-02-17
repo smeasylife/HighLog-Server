@@ -58,8 +58,8 @@ class QuestionServiceTest {
             StudentRecord record = createRecord(TEST_RECORD_ID, user);
             QuestionSet questionSet = createQuestionSet(TEST_QUESTION_SET_ID, record);
             List<Question> questions = List.of(
-                    createQuestion(100L, questionSet, "인성", Question.Difficulty.BASIC, false),
-                    createQuestion(101L, questionSet, "전공적합성", Question.Difficulty.DEEP, true)
+                    createQuestion(100L, questionSet, "인성", Question.Difficulty.기본, false),
+                    createQuestion(101L, questionSet, "전공적합성", Question.Difficulty.심화, true)
             );
 
             given(questionSetRepository.findById(TEST_QUESTION_SET_ID)).willReturn(Optional.of(questionSet));
@@ -87,7 +87,7 @@ class QuestionServiceTest {
             StudentRecord record = createRecord(TEST_RECORD_ID, user);
             QuestionSet questionSet = createQuestionSet(TEST_QUESTION_SET_ID, record);
             List<Question> questions = List.of(
-                    createQuestion(100L, questionSet, "인성", Question.Difficulty.BASIC, false)
+                    createQuestion(100L, questionSet, "인성", Question.Difficulty.기본, false)
             );
 
             given(questionSetRepository.findById(TEST_QUESTION_SET_ID)).willReturn(Optional.of(questionSet));
@@ -111,20 +111,20 @@ class QuestionServiceTest {
             StudentRecord record = createRecord(TEST_RECORD_ID, user);
             QuestionSet questionSet = createQuestionSet(TEST_QUESTION_SET_ID, record);
             List<Question> questions = List.of(
-                    createQuestion(100L, questionSet, "인성", Question.Difficulty.DEEP, false)
+                    createQuestion(100L, questionSet, "인성", Question.Difficulty.심화, false)
             );
 
             given(questionSetRepository.findById(TEST_QUESTION_SET_ID)).willReturn(Optional.of(questionSet));
-            given(questionRepository.findByQuestionSetIdWithFilters(TEST_QUESTION_SET_ID, null, Question.Difficulty.DEEP))
+            given(questionRepository.findByQuestionSetIdWithFilters(TEST_QUESTION_SET_ID, null, Question.Difficulty.심화))
                     .willReturn(questions);
 
             // when
             List<QuestionResponse> responses = questionService.getQuestionsByQuestionSetId(
-                    TEST_USER_ID, TEST_QUESTION_SET_ID, null, "DEEP");
+                    TEST_USER_ID, TEST_QUESTION_SET_ID, null, "심화");
 
             // then
             assertThat(responses).hasSize(1);
-            assertThat(responses.get(0).getDifficulty()).isEqualTo(Question.Difficulty.DEEP);
+            assertThat(responses.get(0).getDifficulty()).isEqualTo(Question.Difficulty.심화);
         }
 
         @Test
@@ -220,6 +220,9 @@ class QuestionServiceTest {
                 .content("테스트 질문입니다.")
                 .difficulty(difficulty)
                 .modelAnswer("모범 답안입니다.")
+                .evaluationCriteria("평가 기준입니다.")
+                .purpose("질문 목적입니다.")
+                .answerPoints("답변 포인트입니다.")
                 .build();
         question.setQuestionSet(questionSet);
         ReflectionTestUtils.setField(question, "id", id);
