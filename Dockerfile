@@ -9,6 +9,9 @@ COPY gradle gradle
 COPY build.gradle .
 COPY settings.gradle .
 
+# jOOQ-custom 프로젝트 복사
+COPY jOOQ-custom jOOQ-custom
+
 # Gradle wrapper 실행 권한 설정
 RUN chmod +x gradlew
 
