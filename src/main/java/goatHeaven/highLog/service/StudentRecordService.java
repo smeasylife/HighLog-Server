@@ -59,6 +59,6 @@ public class StudentRecordService {
         }
 
         // Questions → QuestionSets → StudentRecord 순서로 삭제
-        studentRecordRepository.deleteByIdWithCascade(recordId);
+        studentRecordRepository.deleteAllByStudentRecordId(recordId);
     }
 }
