@@ -117,7 +117,7 @@ CREATE INDEX idx_questions_difficulty ON questions(difficulty);
 - `set_id`: 소속된 질문 세트 ID
 - `category`: 질문 카테고리 (인성, 전공적합성, 의사소통 등)
 - `content`: 질문 내용
-- `difficulty`: 난이도 (`BASIC`, `DEEP`)
+- `difficulty`: 난이도 (`기본`, `압박`, `압박`)
 - `model_answer`: AI가 생성한 모범 답안 (선택적)
 - `created_at`: 질문 생성 시간
 

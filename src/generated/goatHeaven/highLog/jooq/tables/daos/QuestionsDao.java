@@ -176,36 +176,6 @@ public class QuestionsDao extends DAOImpl<QuestionsRecord, Questions, Long> {
     }
 
     /**
-     * Fetch records that have <code>model_answer_criteria BETWEEN
-     * lowerInclusive AND upperInclusive</code>
-     */
-    public List<Questions> fetchRangeOfModelAnswerCriteria(String lowerInclusive, String upperInclusive) {
-        return fetchRange(JQuestions.QUESTIONS.MODEL_ANSWER_CRITERIA, lowerInclusive, upperInclusive);
-    }
-
-    /**
-     * Fetch records that have <code>model_answer_criteria IN (values)</code>
-     */
-    public List<Questions> fetchByModelAnswerCriteria(String... values) {
-        return fetch(JQuestions.QUESTIONS.MODEL_ANSWER_CRITERIA, values);
-    }
-
-    /**
-     * Fetch records that have <code>question_purpose BETWEEN lowerInclusive AND
-     * upperInclusive</code>
-     */
-    public List<Questions> fetchRangeOfQuestionPurpose(String lowerInclusive, String upperInclusive) {
-        return fetchRange(JQuestions.QUESTIONS.QUESTION_PURPOSE, lowerInclusive, upperInclusive);
-    }
-
-    /**
-     * Fetch records that have <code>question_purpose IN (values)</code>
-     */
-    public List<Questions> fetchByQuestionPurpose(String... values) {
-        return fetch(JQuestions.QUESTIONS.QUESTION_PURPOSE, values);
-    }
-
-    /**
      * Fetch records that have <code>set_id BETWEEN lowerInclusive AND
      * upperInclusive</code>
      */
@@ -218,5 +188,35 @@ public class QuestionsDao extends DAOImpl<QuestionsRecord, Questions, Long> {
      */
     public List<Questions> fetchBySetId(Long... values) {
         return fetch(JQuestions.QUESTIONS.SET_ID, values);
+    }
+
+    /**
+     * Fetch records that have <code>evaluation_criteria BETWEEN lowerInclusive
+     * AND upperInclusive</code>
+     */
+    public List<Questions> fetchRangeOfEvaluationCriteria(String lowerInclusive, String upperInclusive) {
+        return fetchRange(JQuestions.QUESTIONS.EVALUATION_CRITERIA, lowerInclusive, upperInclusive);
+    }
+
+    /**
+     * Fetch records that have <code>evaluation_criteria IN (values)</code>
+     */
+    public List<Questions> fetchByEvaluationCriteria(String... values) {
+        return fetch(JQuestions.QUESTIONS.EVALUATION_CRITERIA, values);
+    }
+
+    /**
+     * Fetch records that have <code>purpose BETWEEN lowerInclusive AND
+     * upperInclusive</code>
+     */
+    public List<Questions> fetchRangeOfPurpose(String lowerInclusive, String upperInclusive) {
+        return fetchRange(JQuestions.QUESTIONS.PURPOSE, lowerInclusive, upperInclusive);
+    }
+
+    /**
+     * Fetch records that have <code>purpose IN (values)</code>
+     */
+    public List<Questions> fetchByPurpose(String... values) {
+        return fetch(JQuestions.QUESTIONS.PURPOSE, values);
     }
 }

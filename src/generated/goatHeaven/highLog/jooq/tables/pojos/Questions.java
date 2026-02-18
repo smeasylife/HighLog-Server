@@ -24,9 +24,9 @@ public class Questions implements Serializable {
     private String difficulty;
     private Boolean isBookmarked;
     private String modelAnswer;
-    private String modelAnswerCriteria;
-    private String questionPurpose;
     private Long setId;
+    private String evaluationCriteria;
+    private String purpose;
 
     public Questions() {}
 
@@ -39,9 +39,9 @@ public class Questions implements Serializable {
         this.difficulty = value.difficulty;
         this.isBookmarked = value.isBookmarked;
         this.modelAnswer = value.modelAnswer;
-        this.modelAnswerCriteria = value.modelAnswerCriteria;
-        this.questionPurpose = value.questionPurpose;
         this.setId = value.setId;
+        this.evaluationCriteria = value.evaluationCriteria;
+        this.purpose = value.purpose;
     }
 
     public Questions(
@@ -53,9 +53,9 @@ public class Questions implements Serializable {
         String difficulty,
         Boolean isBookmarked,
         String modelAnswer,
-        String modelAnswerCriteria,
-        String questionPurpose,
-        Long setId
+        Long setId,
+        String evaluationCriteria,
+        String purpose
     ) {
         this.id = id;
         this.answerPoints = answerPoints;
@@ -65,9 +65,9 @@ public class Questions implements Serializable {
         this.difficulty = difficulty;
         this.isBookmarked = isBookmarked;
         this.modelAnswer = modelAnswer;
-        this.modelAnswerCriteria = modelAnswerCriteria;
-        this.questionPurpose = questionPurpose;
         this.setId = setId;
+        this.evaluationCriteria = evaluationCriteria;
+        this.purpose = purpose;
     }
 
     /**
@@ -191,36 +191,6 @@ public class Questions implements Serializable {
     }
 
     /**
-     * Getter for <code>public.questions.model_answer_criteria</code>.
-     */
-    public String getModelAnswerCriteria() {
-        return this.modelAnswerCriteria;
-    }
-
-    /**
-     * Setter for <code>public.questions.model_answer_criteria</code>.
-     */
-    public Questions setModelAnswerCriteria(String modelAnswerCriteria) {
-        this.modelAnswerCriteria = modelAnswerCriteria;
-        return this;
-    }
-
-    /**
-     * Getter for <code>public.questions.question_purpose</code>.
-     */
-    public String getQuestionPurpose() {
-        return this.questionPurpose;
-    }
-
-    /**
-     * Setter for <code>public.questions.question_purpose</code>.
-     */
-    public Questions setQuestionPurpose(String questionPurpose) {
-        this.questionPurpose = questionPurpose;
-        return this;
-    }
-
-    /**
      * Getter for <code>public.questions.set_id</code>.
      */
     public Long getSetId() {
@@ -232,6 +202,36 @@ public class Questions implements Serializable {
      */
     public Questions setSetId(Long setId) {
         this.setId = setId;
+        return this;
+    }
+
+    /**
+     * Getter for <code>public.questions.evaluation_criteria</code>.
+     */
+    public String getEvaluationCriteria() {
+        return this.evaluationCriteria;
+    }
+
+    /**
+     * Setter for <code>public.questions.evaluation_criteria</code>.
+     */
+    public Questions setEvaluationCriteria(String evaluationCriteria) {
+        this.evaluationCriteria = evaluationCriteria;
+        return this;
+    }
+
+    /**
+     * Getter for <code>public.questions.purpose</code>.
+     */
+    public String getPurpose() {
+        return this.purpose;
+    }
+
+    /**
+     * Setter for <code>public.questions.purpose</code>.
+     */
+    public Questions setPurpose(String purpose) {
+        this.purpose = purpose;
         return this;
     }
 
@@ -292,23 +292,23 @@ public class Questions implements Serializable {
         }
         else if (!this.modelAnswer.equals(other.modelAnswer))
             return false;
-        if (this.modelAnswerCriteria == null) {
-            if (other.modelAnswerCriteria != null)
-                return false;
-        }
-        else if (!this.modelAnswerCriteria.equals(other.modelAnswerCriteria))
-            return false;
-        if (this.questionPurpose == null) {
-            if (other.questionPurpose != null)
-                return false;
-        }
-        else if (!this.questionPurpose.equals(other.questionPurpose))
-            return false;
         if (this.setId == null) {
             if (other.setId != null)
                 return false;
         }
         else if (!this.setId.equals(other.setId))
+            return false;
+        if (this.evaluationCriteria == null) {
+            if (other.evaluationCriteria != null)
+                return false;
+        }
+        else if (!this.evaluationCriteria.equals(other.evaluationCriteria))
+            return false;
+        if (this.purpose == null) {
+            if (other.purpose != null)
+                return false;
+        }
+        else if (!this.purpose.equals(other.purpose))
             return false;
         return true;
     }
@@ -325,9 +325,9 @@ public class Questions implements Serializable {
         result = prime * result + ((this.difficulty == null) ? 0 : this.difficulty.hashCode());
         result = prime * result + ((this.isBookmarked == null) ? 0 : this.isBookmarked.hashCode());
         result = prime * result + ((this.modelAnswer == null) ? 0 : this.modelAnswer.hashCode());
-        result = prime * result + ((this.modelAnswerCriteria == null) ? 0 : this.modelAnswerCriteria.hashCode());
-        result = prime * result + ((this.questionPurpose == null) ? 0 : this.questionPurpose.hashCode());
         result = prime * result + ((this.setId == null) ? 0 : this.setId.hashCode());
+        result = prime * result + ((this.evaluationCriteria == null) ? 0 : this.evaluationCriteria.hashCode());
+        result = prime * result + ((this.purpose == null) ? 0 : this.purpose.hashCode());
         return result;
     }
 
@@ -343,9 +343,9 @@ public class Questions implements Serializable {
         sb.append(", ").append(difficulty);
         sb.append(", ").append(isBookmarked);
         sb.append(", ").append(modelAnswer);
-        sb.append(", ").append(modelAnswerCriteria);
-        sb.append(", ").append(questionPurpose);
         sb.append(", ").append(setId);
+        sb.append(", ").append(evaluationCriteria);
+        sb.append(", ").append(purpose);
 
         sb.append(")");
         return sb.toString();

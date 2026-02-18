@@ -103,19 +103,19 @@ public class JQuestions extends TableImpl<QuestionsRecord> {
     public final TableField<QuestionsRecord, String> MODEL_ANSWER = createField(DSL.name("model_answer"), SQLDataType.CLOB, this, "");
 
     /**
-     * The column <code>public.questions.model_answer_criteria</code>.
-     */
-    public final TableField<QuestionsRecord, String> MODEL_ANSWER_CRITERIA = createField(DSL.name("model_answer_criteria"), SQLDataType.CLOB, this, "");
-
-    /**
-     * The column <code>public.questions.question_purpose</code>.
-     */
-    public final TableField<QuestionsRecord, String> QUESTION_PURPOSE = createField(DSL.name("question_purpose"), SQLDataType.CLOB, this, "");
-
-    /**
      * The column <code>public.questions.set_id</code>.
      */
     public final TableField<QuestionsRecord, Long> SET_ID = createField(DSL.name("set_id"), SQLDataType.BIGINT.nullable(false), this, "");
+
+    /**
+     * The column <code>public.questions.evaluation_criteria</code>.
+     */
+    public final TableField<QuestionsRecord, String> EVALUATION_CRITERIA = createField(DSL.name("evaluation_criteria"), SQLDataType.CLOB, this, "");
+
+    /**
+     * The column <code>public.questions.purpose</code>.
+     */
+    public final TableField<QuestionsRecord, String> PURPOSE = createField(DSL.name("purpose"), SQLDataType.CLOB, this, "");
 
     private JQuestions(Name alias, Table<QuestionsRecord> aliased) {
         this(alias, aliased, (Field<?>[]) null, null);

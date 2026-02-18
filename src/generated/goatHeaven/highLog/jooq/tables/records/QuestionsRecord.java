@@ -142,40 +142,10 @@ public class QuestionsRecord extends UpdatableRecordImpl<QuestionsRecord> {
     }
 
     /**
-     * Setter for <code>public.questions.model_answer_criteria</code>.
-     */
-    public QuestionsRecord setModelAnswerCriteria(String value) {
-        set(8, value);
-        return this;
-    }
-
-    /**
-     * Getter for <code>public.questions.model_answer_criteria</code>.
-     */
-    public String getModelAnswerCriteria() {
-        return (String) get(8);
-    }
-
-    /**
-     * Setter for <code>public.questions.question_purpose</code>.
-     */
-    public QuestionsRecord setQuestionPurpose(String value) {
-        set(9, value);
-        return this;
-    }
-
-    /**
-     * Getter for <code>public.questions.question_purpose</code>.
-     */
-    public String getQuestionPurpose() {
-        return (String) get(9);
-    }
-
-    /**
      * Setter for <code>public.questions.set_id</code>.
      */
     public QuestionsRecord setSetId(Long value) {
-        set(10, value);
+        set(8, value);
         return this;
     }
 
@@ -183,7 +153,37 @@ public class QuestionsRecord extends UpdatableRecordImpl<QuestionsRecord> {
      * Getter for <code>public.questions.set_id</code>.
      */
     public Long getSetId() {
-        return (Long) get(10);
+        return (Long) get(8);
+    }
+
+    /**
+     * Setter for <code>public.questions.evaluation_criteria</code>.
+     */
+    public QuestionsRecord setEvaluationCriteria(String value) {
+        set(9, value);
+        return this;
+    }
+
+    /**
+     * Getter for <code>public.questions.evaluation_criteria</code>.
+     */
+    public String getEvaluationCriteria() {
+        return (String) get(9);
+    }
+
+    /**
+     * Setter for <code>public.questions.purpose</code>.
+     */
+    public QuestionsRecord setPurpose(String value) {
+        set(10, value);
+        return this;
+    }
+
+    /**
+     * Getter for <code>public.questions.purpose</code>.
+     */
+    public String getPurpose() {
+        return (String) get(10);
     }
 
     // -------------------------------------------------------------------------
@@ -209,7 +209,7 @@ public class QuestionsRecord extends UpdatableRecordImpl<QuestionsRecord> {
     /**
      * Create a detached, initialised QuestionsRecord
      */
-    public QuestionsRecord(Long id, String answerPoints, String category, String content, LocalDateTime createdAt, String difficulty, Boolean isBookmarked, String modelAnswer, String modelAnswerCriteria, String questionPurpose, Long setId) {
+    public QuestionsRecord(Long id, String answerPoints, String category, String content, LocalDateTime createdAt, String difficulty, Boolean isBookmarked, String modelAnswer, Long setId, String evaluationCriteria, String purpose) {
         super(JQuestions.QUESTIONS);
 
         setId(id);
@@ -220,9 +220,9 @@ public class QuestionsRecord extends UpdatableRecordImpl<QuestionsRecord> {
         setDifficulty(difficulty);
         setIsBookmarked(isBookmarked);
         setModelAnswer(modelAnswer);
-        setModelAnswerCriteria(modelAnswerCriteria);
-        setQuestionPurpose(questionPurpose);
         setSetId(setId);
+        setEvaluationCriteria(evaluationCriteria);
+        setPurpose(purpose);
         resetTouchedOnNotNull();
     }
 
@@ -241,9 +241,9 @@ public class QuestionsRecord extends UpdatableRecordImpl<QuestionsRecord> {
             setDifficulty(value.getDifficulty());
             setIsBookmarked(value.getIsBookmarked());
             setModelAnswer(value.getModelAnswer());
-            setModelAnswerCriteria(value.getModelAnswerCriteria());
-            setQuestionPurpose(value.getQuestionPurpose());
             setSetId(value.getSetId());
+            setEvaluationCriteria(value.getEvaluationCriteria());
+            setPurpose(value.getPurpose());
             resetTouchedOnNotNull();
         }
     }
