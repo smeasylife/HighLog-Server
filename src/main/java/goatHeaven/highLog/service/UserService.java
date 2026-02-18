@@ -46,7 +46,7 @@ public class UserService {
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
         String registDate = user.getCreatedAt().format(DATE_FORMATTER);
-        int questionBookmarkCnt = questionRepository.countBookmarkedQuestionsByUserId(userId);
+        int questionBookmarkCnt = questionRepository.countBookmarkedByUserId(userId);
 
         return DashboardResponse.of(user.getName(), registDate, questionBookmarkCnt);
     }

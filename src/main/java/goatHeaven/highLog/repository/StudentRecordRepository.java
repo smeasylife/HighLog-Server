@@ -43,7 +43,21 @@ public class StudentRecordRepository {
                 .fetchInto(StudentRecords.class);
     }
 
+    public StudentRecords insert(StudentRecords record) {
+        record.setCreatedAt(LocalDateTime.now());
+        if (record.getStatus() == null) {
+            record.setStatus("PENDING");
+        }
+        dao.insert(record);
+        return record;
+    }
 
+    public void updateStatus(Long recordId, String status) {
+        dsl.update(STUDENT_RECORDS)
+                .set(STUDENT_RECORDS.STATUS, status)
+                .where(STUDENT_RECORDS.ID.eq(recordId))
+                .execute();
+    }
 
     public void delete(StudentRecords record) {
         dao.delete(record);

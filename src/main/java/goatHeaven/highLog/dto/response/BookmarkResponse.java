@@ -1,6 +1,6 @@
 package goatHeaven.highLog.dto.response;
 
-import goatHeaven.highLog.domain.Question;
+import goatHeaven.highLog.repository.QuestionRepository.BookmarkedQuestionWithRecord;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -14,17 +14,17 @@ public class BookmarkResponse {
     private String recordTitle;
     private String category;
     private String content;
-    private Question.Difficulty difficulty;
+    private String difficulty;
     private LocalDateTime createdAt;
 
-    public static BookmarkResponse from(Question question) {
+    public static BookmarkResponse from(BookmarkedQuestionWithRecord question) {
         return BookmarkResponse.builder()
-                .questionId(question.getId())
-                .recordTitle(question.getQuestionSet().getRecord().getTitle())
-                .category(question.getCategory())
-                .content(question.getContent())
-                .difficulty(question.getDifficulty())
-                .createdAt(question.getCreatedAt())
+                .questionId(question.id())
+                .recordTitle(question.recordTitle())
+                .category(question.category())
+                .content(question.content())
+                .difficulty(question.difficulty())
+                .createdAt(question.createdAt())
                 .build();
     }
 }

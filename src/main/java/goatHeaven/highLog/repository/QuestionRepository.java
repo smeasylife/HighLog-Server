@@ -1,43 +1,234 @@
 package goatHeaven.highLog.repository;
 
-import goatHeaven.highLog.domain.Question;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
+import goatHeaven.highLog.jooq.tables.JQuestions;
+import goatHeaven.highLog.jooq.tables.JQuestionSets;
+import goatHeaven.highLog.jooq.tables.JStudentRecords;
+import goatHeaven.highLog.jooq.tables.daos.QuestionsDao;
+import goatHeaven.highLog.jooq.tables.pojos.Questions;
+import org.jooq.Condition;
+import org.jooq.Configuration;
+import org.jooq.DSLContext;
+import org.jooq.Record;
+import org.jooq.impl.DSL;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
-public interface QuestionRepository extends JpaRepository<Question, Long> {
+public class QuestionRepository {
 
-    List<Question> findByQuestionSetId(Long questionSetId);
+    private final DSLContext dsl;
+    private final QuestionsDao dao;
+    private static final JQuestions QUESTIONS = JQuestions.QUESTIONS;
+    private static final JQuestionSets QUESTION_SETS = JQuestionSets.QUESTION_SETS;
+    private static final JStudentRecords STUDENT_RECORDS = JStudentRecords.STUDENT_RECORDS;
 
-    List<Question> findByQuestionSetIdAndCategory(Long questionSetId, String category);
+    public QuestionRepository(Configuration configuration, DSLContext dsl) {
+        this.dao = new QuestionsDao(configuration);
+        this.dsl = dsl;
+    }
 
-    List<Question> findByQuestionSetIdAndDifficulty(Long questionSetId, Question.Difficulty difficulty);
+    public Optional<Questions> findById(Long id) {
+        return dao.fetchOptionalById(id);
+    }
 
-    List<Question> findByQuestionSetIdAndCategoryAndDifficulty(Long questionSetId, String category, Question.Difficulty difficulty);
+    public List<Questions> findBySetId(Long setId) {
+        return dao.fetchBySetId(setId);
+    }
 
-    @Query("SELECT q FROM Question q WHERE q.questionSet.id = :questionSetId " +
-           "AND (:category IS NULL OR q.category = :category) " +
-           "AND (:difficulty IS NULL OR q.difficulty = :difficulty)")
-    List<Question> findByQuestionSetIdWithFilters(
-            @Param("questionSetId") Long questionSetId,
-            @Param("category") String category,
-            @Param("difficulty") Question.Difficulty difficulty
-    );
+    public List<Questions> findBySetIdWithFilters(Long setId, String category, String difficulty) {
+        Condition condition = QUESTIONS.SET_ID.eq(setId);
 
-    @Query("SELECT q FROM Question q JOIN FETCH q.questionSet qs JOIN FETCH qs.record r WHERE r.user.id = :userId " +
-           "AND q.isBookmarked = true ORDER BY q.createdAt DESC")
-    List<Question> findBookmarkedQuestionsByUserId(@Param("userId") Long userId);
+        if (category != null) {
+            condition = condition.and(QUESTIONS.CATEGORY.eq(category));
+        }
+        if (difficulty != null) {
+            condition = condition.and(QUESTIONS.DIFFICULTY.eq(difficulty));
+        }
 
-    @Query("SELECT q FROM Question q JOIN FETCH q.questionSet qs JOIN FETCH qs.record r WHERE r.user.id = :userId " +
-           "AND r.id = :recordId AND q.isBookmarked = true ORDER BY q.createdAt DESC")
-    List<Question> findBookmarkedQuestionsByUserIdAndRecordId(@Param("userId") Long userId, @Param("recordId") Long recordId);
+        return dsl.selectFrom(QUESTIONS)
+                .where(condition)
+                .fetchInto(Questions.class);
+    }
 
-    boolean existsByQuestionSetIdAndId(Long questionSetId, Long questionId);
+    public List<Questions> findBookmarkedByUserId(Long userId) {
+        return dsl.selectFrom(QUESTIONS)
+                .where(QUESTIONS.SET_ID.in(
+                        dsl.select(QUESTION_SETS.ID)
+                                .from(QUESTION_SETS)
+                                .join(STUDENT_RECORDS).on(QUESTION_SETS.RECORD_ID.eq(STUDENT_RECORDS.ID))
+                                .where(STUDENT_RECORDS.USER_ID.eq(userId))
+                ))
+                .and(QUESTIONS.IS_BOOKMARKED.eq(true))
+                .orderBy(QUESTIONS.CREATED_AT.desc())
+                .fetchInto(Questions.class);
+    }
 
-    @Query("SELECT COUNT(q) FROM Question q JOIN q.questionSet qs JOIN qs.record r WHERE r.user.id = :userId AND q.isBookmarked = true")
-    int countBookmarkedQuestionsByUserId(@Param("userId") Long userId);
+    public List<Questions> findBookmarkedByUserIdAndRecordId(Long userId, Long recordId) {
+        return dsl.selectFrom(QUESTIONS)
+                .where(QUESTIONS.SET_ID.in(
+                        dsl.select(QUESTION_SETS.ID)
+                                .from(QUESTION_SETS)
+                                .join(STUDENT_RECORDS).on(QUESTION_SETS.RECORD_ID.eq(STUDENT_RECORDS.ID))
+                                .where(STUDENT_RECORDS.USER_ID.eq(userId))
+                                .and(STUDENT_RECORDS.ID.eq(recordId))
+                ))
+                .and(QUESTIONS.IS_BOOKMARKED.eq(true))
+                .orderBy(QUESTIONS.CREATED_AT.desc())
+                .fetchInto(Questions.class);
+    }
+
+    public int countBookmarkedByUserId(Long userId) {
+        return dsl.fetchCount(
+                dsl.selectFrom(QUESTIONS)
+                        .where(QUESTIONS.SET_ID.in(
+                                dsl.select(QUESTION_SETS.ID)
+                                        .from(QUESTION_SETS)
+                                        .join(STUDENT_RECORDS).on(QUESTION_SETS.RECORD_ID.eq(STUDENT_RECORDS.ID))
+                                        .where(STUDENT_RECORDS.USER_ID.eq(userId))
+                        ))
+                        .and(QUESTIONS.IS_BOOKMARKED.eq(true))
+        );
+    }
+
+    public boolean existsBySetIdAndId(Long setId, Long questionId) {
+        return dsl.fetchExists(
+                dsl.selectFrom(QUESTIONS)
+                        .where(QUESTIONS.SET_ID.eq(setId))
+                        .and(QUESTIONS.ID.eq(questionId))
+        );
+    }
+
+    /**
+     * Question의 소유자(userId)를 확인합니다.
+     * Question → QuestionSet → StudentRecord → User 관계를 통해 확인
+     */
+    public boolean isOwner(Long questionId, Long userId) {
+        return dsl.fetchExists(
+                dsl.select()
+                        .from(QUESTIONS)
+                        .join(QUESTION_SETS).on(QUESTIONS.SET_ID.eq(QUESTION_SETS.ID))
+                        .join(STUDENT_RECORDS).on(QUESTION_SETS.RECORD_ID.eq(STUDENT_RECORDS.ID))
+                        .where(QUESTIONS.ID.eq(questionId))
+                        .and(STUDENT_RECORDS.USER_ID.eq(userId))
+        );
+    }
+
+    public void updateBookmark(Long questionId, Boolean isBookmarked) {
+        dsl.update(QUESTIONS)
+                .set(QUESTIONS.IS_BOOKMARKED, isBookmarked)
+                .where(QUESTIONS.ID.eq(questionId))
+                .execute();
+    }
+
+    /**
+     * 북마크된 질문 조회 (recordTitle 포함)
+     * Question + StudentRecord.title 조인해서 반환
+     */
+    public List<BookmarkedQuestionWithRecord> findBookmarkedWithRecordByUserId(Long userId) {
+        return dsl.select(
+                        QUESTIONS.ID,
+                        QUESTIONS.CATEGORY,
+                        QUESTIONS.CONTENT,
+                        QUESTIONS.DIFFICULTY,
+                        QUESTIONS.CREATED_AT,
+                        STUDENT_RECORDS.TITLE.as("recordTitle")
+                )
+                .from(QUESTIONS)
+                .join(QUESTION_SETS).on(QUESTIONS.SET_ID.eq(QUESTION_SETS.ID))
+                .join(STUDENT_RECORDS).on(QUESTION_SETS.RECORD_ID.eq(STUDENT_RECORDS.ID))
+                .where(STUDENT_RECORDS.USER_ID.eq(userId))
+                .and(QUESTIONS.IS_BOOKMARKED.eq(true))
+                .orderBy(QUESTIONS.CREATED_AT.desc())
+                .fetchInto(BookmarkedQuestionWithRecord.class);
+    }
+
+    public List<BookmarkedQuestionWithRecord> findBookmarkedWithRecordByUserIdAndRecordId(Long userId, Long recordId) {
+        return dsl.select(
+                        QUESTIONS.ID,
+                        QUESTIONS.CATEGORY,
+                        QUESTIONS.CONTENT,
+                        QUESTIONS.DIFFICULTY,
+                        QUESTIONS.CREATED_AT,
+                        STUDENT_RECORDS.TITLE.as("recordTitle")
+                )
+                .from(QUESTIONS)
+                .join(QUESTION_SETS).on(QUESTIONS.SET_ID.eq(QUESTION_SETS.ID))
+                .join(STUDENT_RECORDS).on(QUESTION_SETS.RECORD_ID.eq(STUDENT_RECORDS.ID))
+                .where(STUDENT_RECORDS.USER_ID.eq(userId))
+                .and(STUDENT_RECORDS.ID.eq(recordId))
+                .and(QUESTIONS.IS_BOOKMARKED.eq(true))
+                .orderBy(QUESTIONS.CREATED_AT.desc())
+                .fetchInto(BookmarkedQuestionWithRecord.class);
+    }
+
+    // JOIN 결과를 담을 DTO
+    public record BookmarkedQuestionWithRecord(
+            Long id,
+            String category,
+            String content,
+            String difficulty,
+            java.time.LocalDateTime createdAt,
+            String recordTitle
+    ) {}
+
+    /**
+     * Question을 저장하고 생성된 ID를 반환합니다.
+     * 외래키(setId)는 반드시 먼저 저장된 QuestionSet의 ID여야 합니다.
+     */
+    public Long save(Questions question) {
+        return dsl.insertInto(QUESTIONS)
+                .set(QUESTIONS.SET_ID, question.getSetId())
+                .set(QUESTIONS.CATEGORY, question.getCategory())
+                .set(QUESTIONS.CONTENT, question.getContent())
+                .set(QUESTIONS.DIFFICULTY, question.getDifficulty())
+                .set(QUESTIONS.ANSWER_POINTS, question.getAnswerPoints())
+                .set(QUESTIONS.MODEL_ANSWER, question.getModelAnswer())
+                .set(QUESTIONS.MODEL_ANSWER_CRITERIA, question.getModelAnswerCriteria())
+                .set(QUESTIONS.QUESTION_PURPOSE, question.getQuestionPurpose())
+                .set(QUESTIONS.IS_BOOKMARKED, question.getIsBookmarked() != null ? question.getIsBookmarked() : false)
+                .set(QUESTIONS.CREATED_AT, java.time.LocalDateTime.now())
+                .returning(QUESTIONS.ID)
+                .fetchOne()
+                .getId();
+    }
+
+    /**
+     * 여러 Question을 한번에 저장합니다 (Batch Insert).
+     * 외래키(setId)는 반드시 먼저 저장된 QuestionSet의 ID여야 합니다.
+     */
+    public void saveAll(Long setId, List<Questions> questions) {
+        var batch = dsl.batch(
+                dsl.insertInto(QUESTIONS,
+                        QUESTIONS.SET_ID,
+                        QUESTIONS.CATEGORY,
+                        QUESTIONS.CONTENT,
+                        QUESTIONS.DIFFICULTY,
+                        QUESTIONS.ANSWER_POINTS,
+                        QUESTIONS.MODEL_ANSWER,
+                        QUESTIONS.MODEL_ANSWER_CRITERIA,
+                        QUESTIONS.QUESTION_PURPOSE,
+                        QUESTIONS.IS_BOOKMARKED,
+                        QUESTIONS.CREATED_AT
+                ).values((Long) null, null, null, null, null, null, null, null, null, null)
+        );
+
+        java.time.LocalDateTime now = java.time.LocalDateTime.now();
+        for (Questions q : questions) {
+            batch.bind(
+                    setId,
+                    q.getCategory(),
+                    q.getContent(),
+                    q.getDifficulty(),
+                    q.getAnswerPoints(),
+                    q.getModelAnswer(),
+                    q.getModelAnswerCriteria(),
+                    q.getQuestionPurpose(),
+                    q.getIsBookmarked() != null ? q.getIsBookmarked() : false,
+                    now
+            );
+        }
+        batch.execute();
+    }
 }
