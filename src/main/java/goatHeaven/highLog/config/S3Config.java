@@ -9,52 +9,71 @@ import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.S3ClientBuilder;
 import software.amazon.awssdk.services.s3.presigner.S3Presigner;
+import software.amazon.awssdk.services.s3.S3Configuration;
+
+import java.net.URI;
+import java.time.Duration;
 
 import java.net.URI;
 
 @Configuration
 public class S3Config {
 
-    @Value("${cloud.aws.credentials.access-key}")
+    @Value("${SPRING_CLOUD_AWS_CREDENTIALS_ACCESS_KEY}")
     private String accessKey;
 
-    @Value("${cloud.aws.credentials.secret-key}")
+    @Value("${SPRING_CLOUD_AWS_CREDENTIALS_SECRET_KEY}")
     private String secretKey;
 
-    @Value("${cloud.aws.region.static}")
+    @Value("${SPRING_CLOUD_AWS_REGION_STATIC}")
     private String region;
 
-    @Value("${cloud.aws.s3.endpoint:}")
+    @Value("${s3.endpoint}")  // S3 Compatible endpoint (Oracle Object Storage 등)
     private String endpoint;
 
     @Bean
     public S3Client s3Client() {
         AwsBasicCredentials credentials = AwsBasicCredentials.create(accessKey, secretKey);
 
-        S3ClientBuilder builder = S3Client.builder()
-                .credentialsProvider(StaticCredentialsProvider.create(credentials))
-                .region(Region.of(region));
-
+        // S3 Compatible API 지원 (Oracle Object Storage, MinIO 등)
         if (endpoint != null && !endpoint.isEmpty()) {
-            builder.endpointOverride(URI.create(endpoint))
-                    .forcePathStyle(true);
+            return S3Client.builder()
+                    .credentialsProvider(StaticCredentialsProvider.create(credentials))
+                    .region(Region.of(region))
+                    .endpointOverride(URI.create(endpoint))
+                    .serviceConfiguration(S3Configuration.builder()
+                            .pathStyleAccessEnabled(true)
+                            .chunkedEncodingEnabled(false)  // Oracle Object Storage 필수!
+                            .build())
+                    .build();
+        } else {
+            return S3Client.builder()
+                    .credentialsProvider(StaticCredentialsProvider.create(credentials))
+                    .region(Region.of(region))
+                    .build();
         }
-
-        return builder.build();
     }
 
     @Bean
     public S3Presigner s3Presigner() {
         AwsBasicCredentials credentials = AwsBasicCredentials.create(accessKey, secretKey);
 
-        S3Presigner.Builder builder = S3Presigner.builder()
-                .credentialsProvider(StaticCredentialsProvider.create(credentials))
-                .region(Region.of(region));
-
+        // S3 Compatible API 지원 (Oracle Object Storage, MinIO 등)
         if (endpoint != null && !endpoint.isEmpty()) {
-            builder.endpointOverride(URI.create(endpoint));
+            return S3Presigner.builder()
+                    .credentialsProvider(StaticCredentialsProvider.create(credentials))
+                    .region(Region.of(region))
+                    .endpointOverride(URI.create(endpoint))
+                    .serviceConfiguration(S3Configuration.builder()
+                            .pathStyleAccessEnabled(true)
+                            .chunkedEncodingEnabled(false)  // Oracle Object Storage 필수!
+                            .build())
+                    .build();
+        } else {
+            return S3Presigner.builder()
+                    .credentialsProvider(StaticCredentialsProvider.create(credentials))
+                    .region(Region.of(region))
+                    .build();
         }
-
-        return builder.build();
     }
 }
