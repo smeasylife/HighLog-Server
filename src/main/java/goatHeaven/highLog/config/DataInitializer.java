@@ -1,7 +1,7 @@
 package goatHeaven.highLog.config;
 
 import goatHeaven.highLog.domain.Role;
-import goatHeaven.highLog.domain.User;
+import goatHeaven.highLog.jooq.tables.pojos.Users;
 import goatHeaven.highLog.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -33,14 +33,14 @@ public class DataInitializer implements ApplicationRunner {
     @Transactional
     public void run(ApplicationArguments args) {
         if (!userRepository.existsByEmail(adminEmail)) {
-            User admin = User.builder()
-                    .email(adminEmail)
-                    .password(passwordEncoder.encode(adminPassword))
-                    .name(adminName)
-                    .role(Role.ADMIN)
-                    .build();
+            Users admin = new Users();
+            admin.setEmail(adminEmail);
+            admin.setPassword(passwordEncoder.encode(adminPassword));
+            admin.setName(adminName);
+            admin.setRole(Role.ADMIN.name());
+            admin.setMarketingAgreement(false);
 
-            userRepository.save(admin);
+            userRepository.insert(admin);
             log.info("Admin account created: {}", adminEmail);
         } else {
             log.info("Admin account already exists: {}", adminEmail);

@@ -1,6 +1,7 @@
 package goatHeaven.highLog.service;
 
-import goatHeaven.highLog.domain.User;
+import goatHeaven.highLog.domain.Role;
+import goatHeaven.highLog.jooq.tables.pojos.Users;
 import goatHeaven.highLog.dto.request.*;
 import goatHeaven.highLog.dto.response.*;
 import goatHeaven.highLog.exception.CustomException;
@@ -81,16 +82,15 @@ public class AuthService {
             throw new CustomException(ErrorCode.INVALID_PASSWORD_FORMAT);
         }
 
-
         // 사용자 생성
-        User user = User.builder()
-                .email(email)
-                .password(passwordEncoder.encode(request.getPassword()))
-                .name(request.getName())
-                .marketingAgreement(request.getMarketingAgreement())
-                .build();
+        Users user = new Users();
+        user.setEmail(email);
+        user.setPassword(passwordEncoder.encode(request.getPassword()));
+        user.setName(request.getName());
+        user.setMarketingAgreement(request.getMarketingAgreement() != null ? request.getMarketingAgreement() : false);
+        user.setRole(Role.MEMBER.name());
 
-        User savedUser = userRepository.save(user);
+        Users savedUser = userRepository.insert(user);
 
         // 인증 완료 상태 삭제
         redisService.deleteEmailVerified(email);
@@ -99,15 +99,16 @@ public class AuthService {
     }
 
     public LoginResponse login(LoginRequest request) {
-        User user = userRepository.findByEmail(request.getEmail())
+        Users user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new CustomException(ErrorCode.INVALID_CREDENTIALS));
 
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
             throw new CustomException(ErrorCode.INVALID_CREDENTIALS);
         }
 
-        String accessToken = jwtService.generateAccessToken(user.getId(), user.getEmail(), user.getRole());
-        String refreshToken = jwtService.generateRefreshToken(user.getId(), user.getEmail(), user.getRole());
+        Role role = Role.valueOf(user.getRole());
+        String accessToken = jwtService.generateAccessToken(user.getId(), user.getEmail(), role);
+        String refreshToken = jwtService.generateRefreshToken(user.getId(), user.getEmail(), role);
 
         // Refresh Token을 Redis에 저장
         redisService.saveRefreshToken(user.getId(), refreshToken,
@@ -130,12 +131,13 @@ public class AuthService {
         }
 
         // User 조회
-        User user = userRepository.findById(userId)
+        Users user = userRepository.findById(userId)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
         // 새 토큰 발급
-        String newAccessToken = jwtService.generateAccessToken(user.getId(), user.getEmail(), user.getRole());
-        String newRefreshToken = jwtService.generateRefreshToken(user.getId(), user.getEmail(), user.getRole());
+        Role role = Role.valueOf(user.getRole());
+        String newAccessToken = jwtService.generateAccessToken(user.getId(), user.getEmail(), role);
+        String newRefreshToken = jwtService.generateRefreshToken(user.getId(), user.getEmail(), role);
 
         // 기존 Refresh Token 삭제 후 새 Refresh Token 저장
         redisService.deleteRefreshToken(userId);

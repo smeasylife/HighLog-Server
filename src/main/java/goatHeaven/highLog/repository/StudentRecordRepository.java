@@ -1,28 +1,124 @@
 package goatHeaven.highLog.repository;
 
-import goatHeaven.highLog.enums.RecordStatus;
-import goatHeaven.highLog.domain.StudentRecord;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
+import goatHeaven.highLog.jooq.tables.JStudentRecords;
+import goatHeaven.highLog.jooq.tables.JQuestionSets;
+import goatHeaven.highLog.jooq.tables.JQuestions;
+import goatHeaven.highLog.jooq.tables.daos.StudentRecordsDao;
+import goatHeaven.highLog.jooq.tables.pojos.StudentRecords;
+import goatHeaven.highLog.jooq.tables.pojos.QuestionSets;
+import org.jooq.Configuration;
+import org.jooq.DSLContext;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface StudentRecordRepository extends JpaRepository<StudentRecord, Long> {
+public class StudentRecordRepository {
 
-    List<StudentRecord> findByUserIdOrderByCreatedAtDesc(Long userId);
-    List<StudentRecord> findByUserId(Long userId);
+    private final DSLContext dsl;
+    private final StudentRecordsDao dao;
+    private static final JStudentRecords STUDENT_RECORDS = JStudentRecords.STUDENT_RECORDS;
+    private static final JQuestionSets QUESTION_SETS = JQuestionSets.QUESTION_SETS;
+    private static final JQuestions QUESTIONS = JQuestions.QUESTIONS;
 
-    @Query("SELECT sr FROM StudentRecord sr JOIN FETCH sr.user WHERE sr.id = :recordId")
-    Optional<StudentRecord> findByIdWithUser(@Param("recordId") Long recordId);
-    List<StudentRecord> findByUserIdAndStatus(Long userId, RecordStatus status);
+    public StudentRecordRepository(Configuration configuration, DSLContext dsl) {
+        this.dao = new StudentRecordsDao(configuration);
+        this.dsl = dsl;
+    }
 
-    @Query("SELECT sr FROM StudentRecord sr WHERE sr.user.id = :userId AND sr.id = :recordId")
-    Optional<StudentRecord> findByUserIdAndId(@Param("userId") Long userId, @Param("recordId") Long recordId);
-    Optional<StudentRecord> findByIdAndUserId(Long id, Long userId);
+    public Optional<StudentRecords> findById(Long id) {
+        return dao.fetchOptionalById(id);
+    }
 
-    boolean existsByIdAndUserId(Long id, Long userId);
+    public List<StudentRecords> findByUserId(Long userId) {
+        return dao.fetchByUserId(userId);
+    }
+
+    public List<StudentRecords> findByUserIdOrderByCreatedAtDesc(Long userId) {
+        return dsl.selectFrom(STUDENT_RECORDS)
+                .where(STUDENT_RECORDS.USER_ID.eq(userId))
+                .orderBy(STUDENT_RECORDS.CREATED_AT.desc())
+                .fetchInto(StudentRecords.class);
+    }
+
+
+    public void delete(StudentRecords record) {
+        dao.delete(record);
+    }
+
+    /**
+     * 단일 StudentRecord와 연관된 모든 하위 데이터를 삭제합니다.
+     * 삭제 순서: Questions → QuestionSets → StudentRecord
+     */
+    public void deleteAllByStudentRecordId(Long recordId) {
+        // 1. 해당 record의 모든 question_set_id 조회
+        List<Long> questionSetIds = dsl.select(QUESTION_SETS.ID)
+                .from(QUESTION_SETS)
+                .where(QUESTION_SETS.RECORD_ID.eq(recordId))
+                .fetchInto(Long.class);
+
+        // 2. Questions 삭제 (자식)
+        if (!questionSetIds.isEmpty()) {
+            dsl.deleteFrom(QUESTIONS)
+                    .where(QUESTIONS.SET_ID.in(questionSetIds))
+                    .execute();
+        }
+
+        // 3. QuestionSets 삭제
+        dsl.deleteFrom(QUESTION_SETS)
+                .where(QUESTION_SETS.RECORD_ID.eq(recordId))
+                .execute();
+
+        // 4. StudentRecord 삭제
+        dsl.deleteFrom(STUDENT_RECORDS)
+                .where(STUDENT_RECORDS.ID.eq(recordId))
+                .execute();
+    }
+
+    public List<QuestionSets> findQuestionSetsByRecordId(Long recordId) {
+        return dsl.selectFrom(QUESTION_SETS)
+                .where(QUESTION_SETS.RECORD_ID.eq(recordId))
+                .fetchInto(QuestionSets.class);
+    }
+
+    /**
+     * 사용자의 모든 StudentRecord와 하위 데이터를 삭제합니다.
+     * 삭제 순서: Questions → QuestionSets → StudentRecords
+     */
+    public void deleteAllByUserId(Long userId) {
+        // 1. 해당 사용자의 모든 record_id 조회
+        List<Long> recordIds = dsl.select(STUDENT_RECORDS.ID)
+                .from(STUDENT_RECORDS)
+                .where(STUDENT_RECORDS.USER_ID.eq(userId))
+                .fetchInto(Long.class);
+
+        if (recordIds.isEmpty()) {
+            return;
+        }
+
+        // 2. 해당 record들의 모든 question_set_id 조회
+        List<Long> questionSetIds = dsl.select(QUESTION_SETS.ID)
+                .from(QUESTION_SETS)
+                .where(QUESTION_SETS.RECORD_ID.in(recordIds))
+                .fetchInto(Long.class);
+
+        // 3. Questions 삭제 (자식)
+        if (!questionSetIds.isEmpty()) {
+            dsl.deleteFrom(QUESTIONS)
+                    .where(QUESTIONS.SET_ID.in(questionSetIds))
+                    .execute();
+        }
+
+        // 4. QuestionSets 삭제
+        dsl.deleteFrom(QUESTION_SETS)
+                .where(QUESTION_SETS.RECORD_ID.in(recordIds))
+                .execute();
+
+        // 5. StudentRecords 삭제
+        dsl.deleteFrom(STUDENT_RECORDS)
+                .where(STUDENT_RECORDS.USER_ID.eq(userId))
+                .execute();
+    }
 }

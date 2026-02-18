@@ -1,6 +1,6 @@
 package goatHeaven.highLog.dto.response;
 
-import goatHeaven.highLog.domain.User;
+import goatHeaven.highLog.jooq.tables.pojos.Users;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -15,7 +15,7 @@ public class SignupResponse {
     private String name;
     private LocalDateTime createdAt;
 
-    public static SignupResponse from(User user) {
+    public static SignupResponse from(Users user) {
         return SignupResponse.builder()
                 .userId(user.getId())
                 .email(user.getEmail())

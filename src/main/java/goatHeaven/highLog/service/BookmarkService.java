@@ -1,11 +1,12 @@
 package goatHeaven.highLog.service;
 
-import goatHeaven.highLog.domain.Question;
+import goatHeaven.highLog.jooq.tables.pojos.Questions;
 import goatHeaven.highLog.dto.response.BookmarkResponse;
 import goatHeaven.highLog.dto.response.BookmarkToggleResponse;
 import goatHeaven.highLog.exception.CustomException;
 import goatHeaven.highLog.exception.ErrorCode;
 import goatHeaven.highLog.repository.QuestionRepository;
+import goatHeaven.highLog.repository.QuestionRepository.BookmarkedQuestionWithRecord;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,25 +23,28 @@ public class BookmarkService {
 
     @Transactional
     public BookmarkToggleResponse toggleBookmark(Long userId, Long questionId) {
-        Question question = questionRepository.findById(questionId)
+        Questions question = questionRepository.findById(questionId)
                 .orElseThrow(() -> new CustomException(ErrorCode.QUESTION_NOT_FOUND));
 
-        if (!question.getQuestionSet().getRecord().getUser().getId().equals(userId)) {
+        // 소유자 확인
+        if (!questionRepository.isOwner(questionId, userId)) {
             throw new CustomException(ErrorCode.FORBIDDEN);
         }
 
-        question.toggleBookmark();
+        // 북마크 토글
+        Boolean newBookmarkStatus = !Boolean.TRUE.equals(question.getIsBookmarked());
+        questionRepository.updateBookmark(questionId, newBookmarkStatus);
 
-        return BookmarkToggleResponse.of(questionId, question.getIsBookmarked());
+        return BookmarkToggleResponse.of(questionId, newBookmarkStatus);
     }
 
     public List<BookmarkResponse> getBookmarks(Long userId, Long recordId) {
-        List<Question> bookmarkedQuestions;
+        List<BookmarkedQuestionWithRecord> bookmarkedQuestions;
 
         if (recordId != null) {
-            bookmarkedQuestions = questionRepository.findBookmarkedQuestionsByUserIdAndRecordId(userId, recordId);
+            bookmarkedQuestions = questionRepository.findBookmarkedWithRecordByUserIdAndRecordId(userId, recordId);
         } else {
-            bookmarkedQuestions = questionRepository.findBookmarkedQuestionsByUserId(userId);
+            bookmarkedQuestions = questionRepository.findBookmarkedWithRecordByUserId(userId);
         }
 
         return bookmarkedQuestions.stream()

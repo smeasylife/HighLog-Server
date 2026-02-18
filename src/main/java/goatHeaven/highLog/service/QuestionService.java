@@ -1,8 +1,6 @@
 package goatHeaven.highLog.service;
 
-import goatHeaven.highLog.domain.Question;
-import goatHeaven.highLog.domain.Question;
-import goatHeaven.highLog.domain.QuestionSet;
+import goatHeaven.highLog.jooq.tables.pojos.Questions;
 import goatHeaven.highLog.dto.response.QuestionResponse;
 import goatHeaven.highLog.exception.CustomException;
 import goatHeaven.highLog.exception.ErrorCode;
@@ -24,25 +22,23 @@ public class QuestionService {
     private final QuestionSetRepository questionSetRepository;
 
     public List<QuestionResponse> getQuestionsByQuestionSetId(Long userId, Long questionSetId, String category, String difficulty) {
-        QuestionSet questionSet = questionSetRepository.findById(questionSetId)
+        // QuestionSet 존재 여부 확인
+        questionSetRepository.findById(questionSetId)
                 .orElseThrow(() -> new CustomException(ErrorCode.RECORD_NOT_FOUND));
 
-        if (!questionSet.isOwner(userId)) {
+        // 소유자 확인
+        if (!questionSetRepository.isOwner(questionSetId, userId)) {
             throw new CustomException(ErrorCode.FORBIDDEN);
         }
 
-        Question.Difficulty difficultyEnum = null;
+        String difficultyFilter = null;
         if (difficulty != null && !difficulty.isBlank()) {
-            try {
-                difficultyEnum = Question.Difficulty.valueOf(difficulty.toUpperCase());
-            } catch (IllegalArgumentException e) {
-                throw new CustomException(ErrorCode.INVALID_INPUT_VALUE);
-            }
+            difficultyFilter = difficulty.toUpperCase();
         }
 
         String categoryFilter = (category != null && !category.isBlank()) ? category : null;
 
-        List<Question> questions = questionRepository.findByQuestionSetIdWithFilters(questionSetId, categoryFilter, difficultyEnum);
+        List<Questions> questions = questionRepository.findBySetIdWithFilters(questionSetId, categoryFilter, difficultyFilter);
 
         return questions.stream()
                 .map(QuestionResponse::from)

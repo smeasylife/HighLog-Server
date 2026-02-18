@@ -1,7 +1,7 @@
 package goatHeaven.highLog.service;
 
-import goatHeaven.highLog.domain.StudentRecord;
-import goatHeaven.highLog.domain.User;
+import goatHeaven.highLog.jooq.tables.pojos.StudentRecords;
+import goatHeaven.highLog.jooq.tables.pojos.Users;
 import goatHeaven.highLog.dto.request.ChangePasswordRequest;
 import goatHeaven.highLog.dto.request.DeleteAccountRequest;
 import goatHeaven.highLog.dto.response.AccountInfoResponse;
@@ -42,17 +42,17 @@ public class UserService {
     );
 
     public DashboardResponse getDashboard(Long userId) {
-        User user = userRepository.findById(userId)
+        Users user = userRepository.findById(userId)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
         String registDate = user.getCreatedAt().format(DATE_FORMATTER);
-        int questionBookmarkCnt = questionRepository.countBookmarkedQuestionsByUserId(userId);
+        int questionBookmarkCnt = questionRepository.countBookmarkedByUserId(userId);
 
         return DashboardResponse.of(user.getName(), registDate, questionBookmarkCnt);
     }
 
     public AccountInfoResponse getAccountInfo(Long userId) {
-        User user = userRepository.findById(userId)
+        Users user = userRepository.findById(userId)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
         String registDate = user.getCreatedAt().format(DATE_FORMATTER);
@@ -62,7 +62,7 @@ public class UserService {
 
     @Transactional
     public MessageResponse changePassword(Long userId, ChangePasswordRequest request) {
-        User user = userRepository.findById(userId)
+        Users user = userRepository.findById(userId)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
         // 현재 비밀번호 확인
@@ -76,7 +76,7 @@ public class UserService {
         }
 
         // 비밀번호 변경
-        user.updatePassword(passwordEncoder.encode(request.getNewPassword()));
+        userRepository.updatePassword(userId, passwordEncoder.encode(request.getNewPassword()));
 
         log.info("Password changed for user: {}", userId);
 
@@ -85,7 +85,7 @@ public class UserService {
 
     @Transactional
     public MessageResponse deleteAccount(Long userId, DeleteAccountRequest request) {
-        User user = userRepository.findById(userId)
+        Users user = userRepository.findById(userId)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
         // 비밀번호 확인
@@ -94,8 +94,8 @@ public class UserService {
         }
 
         // S3에서 사용자의 모든 생기부 파일 삭제
-        List<StudentRecord> records = studentRecordRepository.findByUserId(userId);
-        for (StudentRecord record : records) {
+        List<StudentRecords> records = studentRecordRepository.findByUserId(userId);
+        for (StudentRecords record : records) {
             try {
                 s3Service.deleteFile(record.getS3Key());
             } catch (Exception e) {
@@ -106,8 +106,11 @@ public class UserService {
         // Redis에서 refresh token 삭제
         redisService.deleteRefreshToken(userId);
 
-        // 사용자 삭제 (cascade로 관련 데이터 삭제)
-        userRepository.delete(user);
+        // 관련 데이터 삭제 (Questions → QuestionSets → StudentRecords)
+        studentRecordRepository.deleteAllByUserId(userId);
+
+        // 사용자 삭제
+        userRepository.deleteById(userId);
 
         log.info("Account deleted for user: {}", userId);
 
