@@ -33,10 +33,6 @@ public class QuestionRepository {
         return dao.fetchOptionalById(id);
     }
 
-    public List<Questions> findBySetId(Long setId) {
-        return dao.fetchBySetId(setId);
-    }
-
     public List<Questions> findBySetIdWithFilters(Long setId, String category, String difficulty) {
         Condition condition = QUESTIONS.SET_ID.eq(setId);
 
@@ -52,32 +48,6 @@ public class QuestionRepository {
                 .fetchInto(Questions.class);
     }
 
-    public List<Questions> findBookmarkedByUserId(Long userId) {
-        return dsl.selectFrom(QUESTIONS)
-                .where(QUESTIONS.SET_ID.in(
-                        dsl.select(QUESTION_SETS.ID)
-                                .from(QUESTION_SETS)
-                                .join(STUDENT_RECORDS).on(QUESTION_SETS.RECORD_ID.eq(STUDENT_RECORDS.ID))
-                                .where(STUDENT_RECORDS.USER_ID.eq(userId))
-                ))
-                .and(QUESTIONS.IS_BOOKMARKED.eq(true))
-                .orderBy(QUESTIONS.CREATED_AT.desc())
-                .fetchInto(Questions.class);
-    }
-
-    public List<Questions> findBookmarkedByUserIdAndRecordId(Long userId, Long recordId) {
-        return dsl.selectFrom(QUESTIONS)
-                .where(QUESTIONS.SET_ID.in(
-                        dsl.select(QUESTION_SETS.ID)
-                                .from(QUESTION_SETS)
-                                .join(STUDENT_RECORDS).on(QUESTION_SETS.RECORD_ID.eq(STUDENT_RECORDS.ID))
-                                .where(STUDENT_RECORDS.USER_ID.eq(userId))
-                                .and(STUDENT_RECORDS.ID.eq(recordId))
-                ))
-                .and(QUESTIONS.IS_BOOKMARKED.eq(true))
-                .orderBy(QUESTIONS.CREATED_AT.desc())
-                .fetchInto(Questions.class);
-    }
 
     public int countBookmarkedByUserId(Long userId) {
         return dsl.fetchCount(
@@ -92,13 +62,6 @@ public class QuestionRepository {
         );
     }
 
-    public boolean existsBySetIdAndId(Long setId, Long questionId) {
-        return dsl.fetchExists(
-                dsl.selectFrom(QUESTIONS)
-                        .where(QUESTIONS.SET_ID.eq(setId))
-                        .and(QUESTIONS.ID.eq(questionId))
-        );
-    }
 
     /**
      * Question의 소유자(userId)를 확인합니다.
@@ -173,62 +136,5 @@ public class QuestionRepository {
             String recordTitle
     ) {}
 
-    /**
-     * Question을 저장하고 생성된 ID를 반환합니다.
-     * 외래키(setId)는 반드시 먼저 저장된 QuestionSet의 ID여야 합니다.
-     */
-    public Long save(Questions question) {
-        return dsl.insertInto(QUESTIONS)
-                .set(QUESTIONS.SET_ID, question.getSetId())
-                .set(QUESTIONS.CATEGORY, question.getCategory())
-                .set(QUESTIONS.CONTENT, question.getContent())
-                .set(QUESTIONS.DIFFICULTY, question.getDifficulty())
-                .set(QUESTIONS.ANSWER_POINTS, question.getAnswerPoints())
-                .set(QUESTIONS.MODEL_ANSWER, question.getModelAnswer())
-                .set(QUESTIONS.MODEL_ANSWER_CRITERIA, question.getModelAnswerCriteria())
-                .set(QUESTIONS.QUESTION_PURPOSE, question.getQuestionPurpose())
-                .set(QUESTIONS.IS_BOOKMARKED, question.getIsBookmarked() != null ? question.getIsBookmarked() : false)
-                .set(QUESTIONS.CREATED_AT, java.time.LocalDateTime.now())
-                .returning(QUESTIONS.ID)
-                .fetchOne()
-                .getId();
-    }
 
-    /**
-     * 여러 Question을 한번에 저장합니다 (Batch Insert).
-     * 외래키(setId)는 반드시 먼저 저장된 QuestionSet의 ID여야 합니다.
-     */
-    public void saveAll(Long setId, List<Questions> questions) {
-        var batch = dsl.batch(
-                dsl.insertInto(QUESTIONS,
-                        QUESTIONS.SET_ID,
-                        QUESTIONS.CATEGORY,
-                        QUESTIONS.CONTENT,
-                        QUESTIONS.DIFFICULTY,
-                        QUESTIONS.ANSWER_POINTS,
-                        QUESTIONS.MODEL_ANSWER,
-                        QUESTIONS.MODEL_ANSWER_CRITERIA,
-                        QUESTIONS.QUESTION_PURPOSE,
-                        QUESTIONS.IS_BOOKMARKED,
-                        QUESTIONS.CREATED_AT
-                ).values((Long) null, null, null, null, null, null, null, null, null, null)
-        );
-
-        java.time.LocalDateTime now = java.time.LocalDateTime.now();
-        for (Questions q : questions) {
-            batch.bind(
-                    setId,
-                    q.getCategory(),
-                    q.getContent(),
-                    q.getDifficulty(),
-                    q.getAnswerPoints(),
-                    q.getModelAnswer(),
-                    q.getModelAnswerCriteria(),
-                    q.getQuestionPurpose(),
-                    q.getIsBookmarked() != null ? q.getIsBookmarked() : false,
-                    now
-            );
-        }
-        batch.execute();
-    }
 }

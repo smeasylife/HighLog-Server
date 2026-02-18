@@ -28,16 +28,6 @@ public class QuestionSetRepository {
         return dao.fetchOptionalById(id);
     }
 
-    public List<QuestionSets> findByRecordId(Long recordId) {
-        return dao.fetchByRecordId(recordId);
-    }
-
-    public Optional<QuestionSets> findByIdAndRecordId(Long setId, Long recordId) {
-        return dsl.selectFrom(QUESTION_SETS)
-                .where(QUESTION_SETS.ID.eq(setId))
-                .and(QUESTION_SETS.RECORD_ID.eq(recordId))
-                .fetchOptionalInto(QuestionSets.class);
-    }
 
     /**
      * QuestionSet의 소유자(userId)를 확인합니다.
@@ -53,19 +43,4 @@ public class QuestionSetRepository {
         );
     }
 
-    /**
-     * QuestionSet을 저장하고 생성된 ID를 반환합니다.
-     */
-    public Long save(QuestionSets questionSet) {
-        return dsl.insertInto(QUESTION_SETS)
-                .set(QUESTION_SETS.TITLE, questionSet.getTitle())
-                .set(QUESTION_SETS.INTERVIEW_TYPE, questionSet.getInterviewType())
-                .set(QUESTION_SETS.TARGET_SCHOOL, questionSet.getTargetSchool())
-                .set(QUESTION_SETS.TARGET_MAJOR, questionSet.getTargetMajor())
-                .set(QUESTION_SETS.RECORD_ID, questionSet.getRecordId())
-                .set(QUESTION_SETS.CREATED_AT, java.time.LocalDateTime.now())
-                .returning(QUESTION_SETS.ID)
-                .fetchOne()
-                .getId();
-    }
 }

@@ -58,6 +58,7 @@ public class StudentRecordService {
             s3Service.deleteFile(record.getS3Key());
         }
 
-        studentRecordRepository.delete(record);
+        // Questions → QuestionSets → StudentRecord 순서로 삭제
+        studentRecordRepository.deleteByIdWithCascade(recordId);
     }
 }

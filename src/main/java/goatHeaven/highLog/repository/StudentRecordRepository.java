@@ -43,24 +43,38 @@ public class StudentRecordRepository {
                 .fetchInto(StudentRecords.class);
     }
 
-    public StudentRecords insert(StudentRecords record) {
-        record.setCreatedAt(LocalDateTime.now());
-        if (record.getStatus() == null) {
-            record.setStatus("PENDING");
-        }
-        dao.insert(record);
-        return record;
-    }
-
-    public void updateStatus(Long recordId, String status) {
-        dsl.update(STUDENT_RECORDS)
-                .set(STUDENT_RECORDS.STATUS, status)
-                .where(STUDENT_RECORDS.ID.eq(recordId))
-                .execute();
-    }
 
     public void delete(StudentRecords record) {
         dao.delete(record);
+    }
+
+    /**
+     * 단일 StudentRecord와 연관된 모든 하위 데이터를 삭제합니다.
+     * 삭제 순서: Questions → QuestionSets → StudentRecord
+     */
+    public void deleteAllByStudentRecordId(Long recordId) {
+        // 1. 해당 record의 모든 question_set_id 조회
+        List<Long> questionSetIds = dsl.select(QUESTION_SETS.ID)
+                .from(QUESTION_SETS)
+                .where(QUESTION_SETS.RECORD_ID.eq(recordId))
+                .fetchInto(Long.class);
+
+        // 2. Questions 삭제 (자식)
+        if (!questionSetIds.isEmpty()) {
+            dsl.deleteFrom(QUESTIONS)
+                    .where(QUESTIONS.SET_ID.in(questionSetIds))
+                    .execute();
+        }
+
+        // 3. QuestionSets 삭제
+        dsl.deleteFrom(QUESTION_SETS)
+                .where(QUESTION_SETS.RECORD_ID.eq(recordId))
+                .execute();
+
+        // 4. StudentRecord 삭제
+        dsl.deleteFrom(STUDENT_RECORDS)
+                .where(STUDENT_RECORDS.ID.eq(recordId))
+                .execute();
     }
 
     public List<QuestionSets> findQuestionSetsByRecordId(Long recordId) {
