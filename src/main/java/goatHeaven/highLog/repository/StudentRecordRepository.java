@@ -84,6 +84,42 @@ public class StudentRecordRepository {
     }
 
     /**
+     * 사용자의 생기부 총 개수 조회
+     */
+    public long countByUserId(Long userId) {
+        return dsl.fetchCount(
+                dsl.selectFrom(STUDENT_RECORDS)
+                        .where(STUDENT_RECORDS.USER_ID.eq(userId))
+        );
+    }
+
+    /**
+     * 사용자의 생기부 페이지네이션 조회 (최신순) - id, title만 반환
+     */
+    public List<goatHeaven.highLog.dto.response.StudentRecordResponse> findByUserIdOrderByCreatedAtDescWithPagination(
+            Long userId,
+            int offset,
+            int limit
+    ) {
+        // id, title만 조회
+        List<StudentRecords> records = dsl.select(
+                        STUDENT_RECORDS.ID,
+                        STUDENT_RECORDS.TITLE
+                )
+                .from(STUDENT_RECORDS)
+                .where(STUDENT_RECORDS.USER_ID.eq(userId))
+                .orderBy(STUDENT_RECORDS.CREATED_AT.desc())
+                .limit(limit)
+                .offset(offset)
+                .fetchInto(StudentRecords.class);
+
+        // StudentRecords → StudentRecordResponse 변환
+        return records.stream()
+                .map(goatHeaven.highLog.dto.response.StudentRecordResponse::new)
+                .toList();
+    }
+
+    /**
      * 사용자의 모든 StudentRecord와 하위 데이터를 삭제합니다.
      * 삭제 순서: Questions → QuestionSets → StudentRecords
      */
