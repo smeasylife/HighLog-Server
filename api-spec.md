@@ -297,14 +297,31 @@ GET /api/records
 Authorization: Bearer {accessToken}
 ```
 
+**Query Parameters**
+- `page` (optional): 페이지 번호 (기본값: 1)
+
+**Example Request**
+```
+GET /api/records?page=1
+```
+
 **Response**
 ```json
-[
-  {
-    "id": 10,
-    "title": "2025학년도 수시 대비 생기부"
-  }
-]
+{
+  "records": [
+    {
+      "id": 10,
+      "title": "2025학년도 수시 대비 생기부"
+    },
+    {
+      "id": 9,
+      "title": "2024년 2학기 생기부"
+    }
+  ],
+  "totalPages": 3,
+  "currentPage": 1,
+  "totalCount": 15
+}
 ```
 
 **Error Cases**

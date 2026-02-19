@@ -4,6 +4,7 @@ import goatHeaven.highLog.dto.response.MessageResponse;
 import goatHeaven.highLog.dto.response.PresignedUrlResponse;
 import goatHeaven.highLog.dto.response.StudentRecordResponse;
 import goatHeaven.highLog.dto.response.StudentRecordDetailResponse;
+import goatHeaven.highLog.dto.response.StudentRecordPageResponse;
 import goatHeaven.highLog.security.CustomUserPrincipal;
 import goatHeaven.highLog.service.S3Service;
 import goatHeaven.highLog.service.StudentRecordService;
@@ -31,10 +32,14 @@ public class StudentRecordController {
     }
 
     @GetMapping
-    public ResponseEntity<List<StudentRecordResponse>> getRecords(
+    public ResponseEntity<StudentRecordPageResponse> getRecords(
+            @RequestParam(defaultValue = "1") int page,
             @AuthenticationPrincipal CustomUserPrincipal principal) {
-        List<StudentRecordResponse> responses = studentRecordService.getRecords(principal.getUserId());
-        return ResponseEntity.ok(responses);
+        StudentRecordPageResponse response = studentRecordService.getRecordsWithPagination(
+                principal.getUserId(),
+                page
+        );
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/{recordId}")

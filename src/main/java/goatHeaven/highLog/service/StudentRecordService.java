@@ -1,5 +1,6 @@
 package goatHeaven.highLog.service;
 
+import goatHeaven.highLog.dto.response.StudentRecordPageResponse;
 import goatHeaven.highLog.jooq.tables.pojos.StudentRecords;
 import goatHeaven.highLog.jooq.tables.pojos.QuestionSets;
 import goatHeaven.highLog.dto.response.StudentRecordResponse;
@@ -27,6 +28,39 @@ public class StudentRecordService {
                 .stream()
                 .map(StudentRecordResponse::new)
                 .toList();
+    }
+
+    public StudentRecordPageResponse getRecordsWithPagination(Long userId, int page) {
+        // 페이지당 7개
+        int pageSize = 7;
+
+        // 페이지 번호 검증 (1 이상)
+        if (page < 1) {
+            page = 1;
+        }
+
+        // 전체 개수 조회
+        long totalCount = studentRecordRepository.countByUserId(userId);
+
+        // 전체 페이지 수 계산
+        int totalPages = (int) Math.ceil((double) totalCount / pageSize);
+        if (totalCount == 0) {
+            totalPages = 1;
+        }
+
+        // 페이지 번호가 전체 페이지 수를 초과하면 마지막 페이지로
+        if (page > totalPages) {
+            page = totalPages;
+        }
+
+        // 오프셋 계산
+        int offset = (page - 1) * pageSize;
+
+        // 생기부 조회
+        List<StudentRecordResponse> records =
+                studentRecordRepository.findByUserIdOrderByCreatedAtDescWithPagination(userId, offset, pageSize);
+
+        return StudentRecordPageResponse.of(records, totalPages, page, totalCount);
     }
 
     public StudentRecordDetailResponse getRecord(Long recordId, Long userId) {
