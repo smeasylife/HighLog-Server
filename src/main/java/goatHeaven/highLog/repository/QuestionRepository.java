@@ -43,12 +43,16 @@ public class QuestionRepository {
             condition = condition.and(QUESTIONS.DIFFICULTY.eq(difficulty));
         }
 
-        return dsl.select(QUESTIONS)
-                .from(QUESTIONS)
-                .join(QUESTION_SETS).on(QUESTIONS.SET_ID.eq(QUESTION_SETS.ID))
-                .join(STUDENT_RECORDS).on(QUESTION_SETS.RECORD_ID.eq(STUDENT_RECORDS.ID))
+        // 서브쿼리로 userId 필터링
+        return dsl.selectFrom(QUESTIONS)
                 .where(condition)
-                .and(STUDENT_RECORDS.USER_ID.eq(userId))
+                .and(QUESTIONS.SET_ID.in(
+                        dsl.select(QUESTION_SETS.ID)
+                                .from(QUESTION_SETS)
+                                .join(STUDENT_RECORDS).on(QUESTION_SETS.RECORD_ID.eq(STUDENT_RECORDS.ID))
+                                .where(QUESTION_SETS.ID.eq(setId))
+                                .and(STUDENT_RECORDS.USER_ID.eq(userId))
+                ))
                 .fetchInto(Questions.class);
     }
 
