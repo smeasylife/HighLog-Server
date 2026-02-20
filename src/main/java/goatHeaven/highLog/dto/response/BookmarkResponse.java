@@ -15,6 +15,9 @@ public class BookmarkResponse {
     private String category;
     private String content;
     private String difficulty;
+    private String evaluationCriteria;
+    private String modelAnswer;
+    private String purpose;
     private LocalDateTime createdAt;
 
     public static BookmarkResponse from(BookmarkedQuestionWithRecord question) {
@@ -24,6 +27,9 @@ public class BookmarkResponse {
                 .category(question.category())
                 .content(question.content())
                 .difficulty(question.difficulty())
+                .evaluationCriteria(question.evaluationCriteria())
+                .modelAnswer(question.modelAnswer())
+                .purpose(question.purpose())
                 .createdAt(question.createdAt())
                 .build();
     }
