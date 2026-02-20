@@ -99,6 +99,9 @@ public class QuestionRepository {
                         QUESTIONS.CATEGORY,
                         QUESTIONS.CONTENT,
                         QUESTIONS.DIFFICULTY,
+                        QUESTIONS.EVALUATION_CRITERIA,
+                        QUESTIONS.MODEL_ANSWER,
+                        QUESTIONS.PURPOSE,
                         QUESTIONS.CREATED_AT,
                         STUDENT_RECORDS.TITLE.as("recordTitle")
                 )
@@ -117,6 +120,9 @@ public class QuestionRepository {
                         QUESTIONS.CATEGORY,
                         QUESTIONS.CONTENT,
                         QUESTIONS.DIFFICULTY,
+                        QUESTIONS.EVALUATION_CRITERIA,
+                        QUESTIONS.MODEL_ANSWER,
+                        QUESTIONS.PURPOSE,
                         QUESTIONS.CREATED_AT,
                         STUDENT_RECORDS.TITLE.as("recordTitle")
                 )
@@ -136,6 +142,9 @@ public class QuestionRepository {
             String category,
             String content,
             String difficulty,
+            String evaluationCriteria,
+            String modelAnswer,
+            String purpose,
             java.time.LocalDateTime createdAt,
             String recordTitle
     ) {}

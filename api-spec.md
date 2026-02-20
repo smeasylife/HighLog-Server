@@ -519,21 +519,25 @@ Authorization: Bearer {accessToken}
 ```json
 [
   {
-    "bookmarkId": 50,
     "questionId": 101,
     "recordTitle": "2025학년도 수시 생기부",
     "category": "인성",
     "content": "동아리 활동 중 갈등을 해결한 사례...",
     "difficulty": "BASIC",
+    "evaluationCriteria": "갈등 상황의 구체성, 해결 과정의 논리성, 본인의 역할 명확성",
+    "modelAnswer": "저는 2학년 로봇 동아리 활동 당시 팀원 간 역할 분담 문제로 갈등이 있었습니다...",
+    "purpose": "협업 능력과 갈등 해결 역량을 평가하기 위한 질문입니다.",
     "createdAt": "2024-05-21T15:30:00Z"
   },
   {
-    "bookmarkId": 51,
     "questionId": 105,
     "recordTitle": "2025학년도 수시 생기부",
     "category": "전공적합성",
     "content": "컴퓨터 과학에서 가장 흥미로운 분야는...",
     "difficulty": "DEEP",
+    "evaluationCriteria": "전공에 대한 이해도, 탐구 깊이, 학업 계획과의 연계성",
+    "modelAnswer": null,
+    "purpose": "지원 전공에 대한 관심도와 학업 역량을 평가하기 위한 질문입니다.",
     "createdAt": "2024-05-21T16:00:00Z"
   }
 ]
