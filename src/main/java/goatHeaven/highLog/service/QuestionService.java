@@ -38,7 +38,7 @@ public class QuestionService {
 
         String categoryFilter = (category != null && !category.isBlank()) ? category : null;
 
-        List<Questions> questions = questionRepository.findBySetIdWithFilters(questionSetId, categoryFilter, difficultyFilter);
+        List<Questions> questions = questionRepository.findBySetIdWithFilters(questionSetId, userId, categoryFilter, difficultyFilter);
 
         return questions.stream()
                 .map(QuestionResponse::from)
