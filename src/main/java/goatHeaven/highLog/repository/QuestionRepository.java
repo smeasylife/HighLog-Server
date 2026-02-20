@@ -33,7 +33,7 @@ public class QuestionRepository {
         return dao.fetchOptionalById(id);
     }
 
-    public List<Questions> findBySetIdWithFilters(Long setId, String category, String difficulty) {
+    public List<Questions> findBySetIdWithFilters(Long setId, Long userId, String category, String difficulty) {
         Condition condition = QUESTIONS.SET_ID.eq(setId);
 
         if (category != null) {
@@ -43,8 +43,12 @@ public class QuestionRepository {
             condition = condition.and(QUESTIONS.DIFFICULTY.eq(difficulty));
         }
 
-        return dsl.selectFrom(QUESTIONS)
+        return dsl.select(QUESTIONS)
+                .from(QUESTIONS)
+                .join(QUESTION_SETS).on(QUESTIONS.SET_ID.eq(QUESTION_SETS.ID))
+                .join(STUDENT_RECORDS).on(QUESTION_SETS.RECORD_ID.eq(STUDENT_RECORDS.ID))
                 .where(condition)
+                .and(STUDENT_RECORDS.USER_ID.eq(userId))
                 .fetchInto(Questions.class);
     }
 
