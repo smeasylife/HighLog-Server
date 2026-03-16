@@ -752,30 +752,40 @@ GET /api/notices
 
 **Query Parameters** (선택)
 - `page`: 페이지 번호 (기본값: 0)
-- `size`: 페이지 크기 (기본값: 10)
+- `size`: 페이지 크기 (기본값: 7)
 
 **Response**
 ```json
 {
-  "content": [
+  "notices": [
     {
       "id": 1,
       "title": "서비스 정기 점검 안내",
+      "content": "2024년 5월 21일 오전 2시부터...",
       "isPinned": true,
-      "createdAt": "2024-05-20T10:00:00Z"
+      "createdAt": "2024-05-20T10:00:00",
+      "updatedAt": "2024-05-20T10:00:00"
     },
     {
       "id": 2,
       "title": "새로운 기능 업데이트",
+      "content": "새로운 면접 기능이 추가되었습니다...",
       "isPinned": false,
-      "createdAt": "2024-05-19T15:00:00Z"
+      "createdAt": "2024-05-19T15:00:00",
+      "updatedAt": "2024-05-19T15:00:00"
     }
   ],
-  "totalElements": 25,
+  "currentPage": 0,
   "totalPages": 3,
-  "currentPage": 0
+  "totalElements": 21,
+  "hasNext": true,
+  "hasPrevious": false
 }
 ```
+
+**정렬 순서**
+- 고정(`isPinned: true`) 공지가 먼저 표시됩니다.
+- 동일 조건 내에서는 최신순(`createdAt` 내림차순)으로 정렬됩니다.
 
 ---
 
@@ -796,17 +806,121 @@ GET /api/notices/{id}
   "title": "서비스 정기 점검 안내",
   "content": "2024년 5월 21일 오전 2시부터 6시까지 정기 점검이 진행됩니다...",
   "isPinned": true,
-  "createdAt": "2024-05-20T10:00:00Z",
-  "updatedAt": "2024-05-20T10:00:00Z"
+  "createdAt": "2024-05-20T10:00:00",
+  "updatedAt": "2024-05-20T10:00:00"
 }
 ```
 
 **Error Cases**
-- `404 Not Found`: 해당 공지글이 삭제되었거나 존재하지 않습니다.
+- `404 Not Found`: 해당 공지사항을 찾을 수 없습니다.
 
 ---
 
-### 5-3. FAQ 목록 조회
+### 5-3. 공지사항 작성 (관리자 전용)
+
+**Endpoint**
+```
+POST /api/notices
+```
+
+**Headers**
+```
+Authorization: Bearer {accessToken}
+```
+
+**Request Body**
+```json
+{
+  "title": "서비스 정기 점검 안내",
+  "content": "2024년 5월 21일 오전 2시부터 6시까지 정기 점검이 진행됩니다.",
+  "isPinned": false
+}
+```
+
+**Response** (`201 Created`)
+```json
+{
+  "id": 1,
+  "title": "서비스 정기 점검 안내",
+  "content": "2024년 5월 21일 오전 2시부터 6시까지 정기 점검이 진행됩니다.",
+  "isPinned": false,
+  "createdAt": "2024-05-20T10:00:00",
+  "updatedAt": "2024-05-20T10:00:00"
+}
+```
+
+**Error Cases**
+- `400 Bad Request`: 제목 또는 내용이 비어있습니다.
+- `403 Forbidden`: 관리자만 접근 가능합니다.
+
+---
+
+### 5-4. 공지사항 수정 (관리자 전용)
+
+**Endpoint**
+```
+PUT /api/notices/{id}
+```
+
+**Headers**
+```
+Authorization: Bearer {accessToken}
+```
+
+**Path Parameters**
+- `id`: 공지사항 ID
+
+**Request Body**
+```json
+{
+  "title": "서비스 정기 점검 안내 (수정)",
+  "content": "점검 일정이 변경되었습니다.",
+  "isPinned": true
+}
+```
+
+**Response**
+```json
+{
+  "id": 1,
+  "title": "서비스 정기 점검 안내 (수정)",
+  "content": "점검 일정이 변경되었습니다.",
+  "isPinned": true,
+  "createdAt": "2024-05-20T10:00:00",
+  "updatedAt": "2024-05-20T11:30:00"
+}
+```
+
+**Error Cases**
+- `403 Forbidden`: 관리자만 접근 가능합니다.
+- `404 Not Found`: 해당 공지사항을 찾을 수 없습니다.
+
+---
+
+### 5-5. 공지사항 삭제 (관리자 전용)
+
+**Endpoint**
+```
+DELETE /api/notices/{id}
+```
+
+**Headers**
+```
+Authorization: Bearer {accessToken}
+```
+
+**Path Parameters**
+- `id`: 공지사항 ID
+
+**Response** (`204 No Content`)
+
+**Error Cases**
+- `403 Forbidden`: 관리자만 접근 가능합니다.
+- `404 Not Found`: 해당 공지사항을 찾을 수 없습니다.
+
+---
+
+### 5-6. FAQ 목록 조회
 
 **Endpoint**
 ```
