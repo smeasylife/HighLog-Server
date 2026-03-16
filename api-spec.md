@@ -752,7 +752,7 @@ GET /api/notices
 
 **Query Parameters** (선택)
 - `page`: 페이지 번호 (기본값: 0)
-- `size`: 페이지 크기 (기본값: 7)
+- `size`: 페이지 크기 (기본값: 6)
 
 **Response**
 ```json
@@ -929,26 +929,174 @@ GET /api/faqs
 
 **Query Parameters** (선택)
 - `category`: 카테고리 필터 (예: `사용법`, `결제`)
+- `page`: 페이지 번호 (기본값: 0)
+- `size`: 페이지 크기 (기본값: 6)
 
 **Response**
 ```json
-[
-  {
-    "id": 1,
-    "category": "사용법",
-    "question": "생기부는 어떻게 업로드하나요?",
-    "answer": "마이페이지 > 생기부 관리에서 PDF 파일을 업로드할 수 있습니다...",
-    "displayOrder": 1
-  },
-  {
-    "id": 2,
-    "category": "결제",
-    "question": "결제는 어떤 방식으로 가능한가요?",
-    "answer": "신용카드, 체크카드, 카카오페이 등 다양한 결제 수단을 지원합니다...",
-    "displayOrder": 2
-  }
-]
+{
+  "faqs": [
+    {
+      "id": 1,
+      "category": "사용법",
+      "question": "생기부는 어떻게 업로드하나요?",
+      "answer": "마이페이지 > 생기부 관리에서 PDF 파일을 업로드할 수 있습니다...",
+      "displayOrder": 1,
+      "createdAt": "2024-05-20T10:00:00"
+    },
+    {
+      "id": 2,
+      "category": "결제",
+      "question": "결제는 어떤 방식으로 가능한가요?",
+      "answer": "신용카드, 체크카드, 카카오페이 등 다양한 결제 수단을 지원합니다...",
+      "displayOrder": 2,
+      "createdAt": "2024-05-19T15:00:00"
+    }
+  ],
+  "currentPage": 0,
+  "totalPages": 2,
+  "totalElements": 10,
+  "hasNext": true,
+  "hasPrevious": false
+}
 ```
+
+**정렬 순서**
+- `displayOrder` 오름차순으로 먼저 정렬됩니다.
+- 동일한 순서 내에서는 최신순(`createdAt` 내림차순)으로 정렬됩니다.
+
+---
+
+### 5-7. FAQ 상세 조회
+
+**Endpoint**
+```
+GET /api/faqs/{id}
+```
+
+**Path Parameters**
+- `id`: FAQ ID
+
+**Response**
+```json
+{
+  "id": 1,
+  "category": "사용법",
+  "question": "생기부는 어떻게 업로드하나요?",
+  "answer": "마이페이지 > 생기부 관리에서 PDF 파일을 업로드할 수 있습니다...",
+  "displayOrder": 1,
+  "createdAt": "2024-05-20T10:00:00"
+}
+```
+
+**Error Cases**
+- `404 Not Found`: 해당 FAQ를 찾을 수 없습니다.
+
+---
+
+### 5-8. FAQ 작성 (관리자 전용)
+
+**Endpoint**
+```
+POST /api/faqs
+```
+
+**Headers**
+```
+Authorization: Bearer {accessToken}
+```
+
+**Request Body**
+```json
+{
+  "category": "사용법",
+  "question": "생기부는 어떻게 업로드하나요?",
+  "answer": "마이페이지 > 생기부 관리에서 PDF 파일을 업로드할 수 있습니다.",
+  "displayOrder": 1
+}
+```
+
+**Response** (`201 Created`)
+```json
+{
+  "id": 1,
+  "category": "사용법",
+  "question": "생기부는 어떻게 업로드하나요?",
+  "answer": "마이페이지 > 생기부 관리에서 PDF 파일을 업로드할 수 있습니다.",
+  "displayOrder": 1,
+  "createdAt": "2024-05-20T10:00:00"
+}
+```
+
+**Error Cases**
+- `400 Bad Request`: 필수 필드가 비어있습니다.
+- `403 Forbidden`: 관리자만 접근 가능합니다.
+
+---
+
+### 5-9. FAQ 수정 (관리자 전용)
+
+**Endpoint**
+```
+PUT /api/faqs/{id}
+```
+
+**Headers**
+```
+Authorization: Bearer {accessToken}
+```
+
+**Path Parameters**
+- `id`: FAQ ID
+
+**Request Body**
+```json
+{
+  "category": "사용법",
+  "question": "생기부는 어떻게 업로드하나요? (수정)",
+  "answer": "수정된 답변 내용입니다.",
+  "displayOrder": 2
+}
+```
+
+**Response**
+```json
+{
+  "id": 1,
+  "category": "사용법",
+  "question": "생기부는 어떻게 업로드하나요? (수정)",
+  "answer": "수정된 답변 내용입니다.",
+  "displayOrder": 2,
+  "createdAt": "2024-05-20T10:00:00"
+}
+```
+
+**Error Cases**
+- `403 Forbidden`: 관리자만 접근 가능합니다.
+- `404 Not Found`: 해당 FAQ를 찾을 수 없습니다.
+
+---
+
+### 5-10. FAQ 삭제 (관리자 전용)
+
+**Endpoint**
+```
+DELETE /api/faqs/{id}
+```
+
+**Headers**
+```
+Authorization: Bearer {accessToken}
+```
+
+**Path Parameters**
+- `id`: FAQ ID
+
+**Response** (`204 No Content`)
+
+**Error Cases**
+- `403 Forbidden`: 관리자만 접근 가능합니다.
+- `404 Not Found`: 해당 FAQ를 찾을 수 없습니다.
 
 ---
 

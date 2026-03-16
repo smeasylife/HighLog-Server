@@ -22,7 +22,7 @@ public class NoticeService {
 
     private final NoticeRepository noticeRepository;
 
-    private static final int DEFAULT_PAGE_SIZE = 7;
+    private static final int DEFAULT_PAGE_SIZE = 6;
 
     public List<NoticeResponse> getAllNotices() {
         return noticeRepository.findAll().stream()
