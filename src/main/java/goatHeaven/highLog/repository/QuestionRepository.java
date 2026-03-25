@@ -43,17 +43,30 @@ public class QuestionRepository {
             condition = condition.and(QUESTIONS.DIFFICULTY.eq(difficulty));
         }
 
-        // 서브쿼리로 userId 필터링 (jOOQ JOIN 후 fetchInto 매핑 이슈 회피)
+        // EXISTS 서브쿼리로 userId 필터링
         return dsl.selectFrom(QUESTIONS)
                 .where(condition)
-                .and(QUESTIONS.SET_ID.in(
-                        dsl.select(QUESTION_SETS.ID)
+                .andExists(
+                        dsl.selectOne()
                                 .from(QUESTION_SETS)
                                 .join(STUDENT_RECORDS).on(QUESTION_SETS.RECORD_ID.eq(STUDENT_RECORDS.ID))
                                 .where(QUESTION_SETS.ID.eq(setId))
                                 .and(STUDENT_RECORDS.USER_ID.eq(userId))
-                ))
-                .fetchInto(Questions.class);
+                )
+                .fetch()
+                .map(r -> new Questions(
+                        r.get(QUESTIONS.ID),
+                        r.get(QUESTIONS.ANSWER_POINTS),
+                        r.get(QUESTIONS.CATEGORY),
+                        r.get(QUESTIONS.CONTENT),
+                        r.get(QUESTIONS.CREATED_AT),
+                        r.get(QUESTIONS.DIFFICULTY),
+                        r.get(QUESTIONS.IS_BOOKMARKED),
+                        r.get(QUESTIONS.MODEL_ANSWER),
+                        r.get(QUESTIONS.SET_ID),
+                        r.get(QUESTIONS.EVALUATION_CRITERIA),
+                        r.get(QUESTIONS.PURPOSE)
+                ));
     }
 
 
