@@ -111,6 +111,21 @@ public class StudentRecordsRecord extends UpdatableRecordImpl<StudentRecordsReco
         return (Long) get(5);
     }
 
+    /**
+     * Setter for <code>public.student_records.filename</code>.
+     */
+    public StudentRecordsRecord setFilename(String value) {
+        set(6, value);
+        return this;
+    }
+
+    /**
+     * Getter for <code>public.student_records.filename</code>.
+     */
+    public String getFilename() {
+        return (String) get(6);
+    }
+
     // -------------------------------------------------------------------------
     // Primary key information
     // -------------------------------------------------------------------------
@@ -134,7 +149,7 @@ public class StudentRecordsRecord extends UpdatableRecordImpl<StudentRecordsReco
     /**
      * Create a detached, initialised StudentRecordsRecord
      */
-    public StudentRecordsRecord(Long id, LocalDateTime createdAt, String s3Key, String status, String title, Long userId) {
+    public StudentRecordsRecord(Long id, LocalDateTime createdAt, String s3Key, String status, String title, Long userId, String filename) {
         super(JStudentRecords.STUDENT_RECORDS);
 
         setId(id);
@@ -143,6 +158,7 @@ public class StudentRecordsRecord extends UpdatableRecordImpl<StudentRecordsReco
         setStatus(status);
         setTitle(title);
         setUserId(userId);
+        setFilename(filename);
         resetTouchedOnNotNull();
     }
 
@@ -159,6 +175,7 @@ public class StudentRecordsRecord extends UpdatableRecordImpl<StudentRecordsReco
             setStatus(value.getStatus());
             setTitle(value.getTitle());
             setUserId(value.getUserId());
+            setFilename(value.getFilename());
             resetTouchedOnNotNull();
         }
     }

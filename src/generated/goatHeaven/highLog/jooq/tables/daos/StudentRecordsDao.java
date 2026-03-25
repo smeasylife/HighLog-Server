@@ -144,4 +144,19 @@ public class StudentRecordsDao extends DAOImpl<StudentRecordsRecord, StudentReco
     public List<StudentRecords> fetchByUserId(Long... values) {
         return fetch(JStudentRecords.STUDENT_RECORDS.USER_ID, values);
     }
+
+    /**
+     * Fetch records that have <code>filename BETWEEN lowerInclusive AND
+     * upperInclusive</code>
+     */
+    public List<StudentRecords> fetchRangeOfFilename(String lowerInclusive, String upperInclusive) {
+        return fetchRange(JStudentRecords.STUDENT_RECORDS.FILENAME, lowerInclusive, upperInclusive);
+    }
+
+    /**
+     * Fetch records that have <code>filename IN (values)</code>
+     */
+    public List<StudentRecords> fetchByFilename(String... values) {
+        return fetch(JStudentRecords.STUDENT_RECORDS.FILENAME, values);
+    }
 }

@@ -44,6 +44,7 @@ CREATE TABLE student_records (
     id BIGSERIAL PRIMARY KEY,
     user_id BIGINT NOT NULL,
     title VARCHAR(255) NOT NULL,
+    filename VARCHAR(255) NOT NULL,
     s3_key VARCHAR(512) NOT NULL,
     status VARCHAR(20) DEFAULT 'PENDING',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -58,6 +59,7 @@ CREATE INDEX idx_records_status ON student_records(status);
 - `id`: 생기부 고유 식별자
 - `user_id`: 소유자 사용자 ID
 - `title`: 생기부 제목 (사용자 입력)
+- `filename`: 업로드된 원본 파일명
 - `s3_key`: S3 저장 경로 (`users/{userId}/records/{uuid}_filename.pdf`)
 - `status`: 분석 상태 (`PENDING`, `ANALYZING`, `READY`, `FAILED`)
 - `created_at`: 생기부 등록 시간
