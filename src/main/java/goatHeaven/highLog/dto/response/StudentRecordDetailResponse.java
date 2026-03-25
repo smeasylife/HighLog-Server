@@ -13,6 +13,7 @@ public class StudentRecordDetailResponse {
 
     private final Long id;
     private final String title;
+    private final String filename;
     private final String status;
     private final LocalDateTime createdAt;
     private final List<QuestionSetSummary> questionSets;
@@ -20,6 +21,7 @@ public class StudentRecordDetailResponse {
     public StudentRecordDetailResponse(StudentRecords record, List<QuestionSets> questionSets) {
         this.id = record.getId();
         this.title = record.getTitle();
+        this.filename = record.getFilename();
         this.status = record.getStatus();
         this.createdAt = record.getCreatedAt();
         this.questionSets = questionSets.stream()
