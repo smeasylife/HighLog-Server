@@ -31,6 +31,9 @@ public class StudentRecord {
     @Column(nullable = false, length = 255)
     private String title;
 
+    @Column(nullable = false, length = 255)
+    private String filename;
+
     @Column(name = "s3_key", nullable = false, length = 512)
     private String s3Key;
 
@@ -50,9 +53,10 @@ public class StudentRecord {
     }
 
     @Builder
-    public StudentRecord(User user, String title, String s3Key, RecordStatus status) {
+    public StudentRecord(User user, String title, String filename, String s3Key, RecordStatus status) {
         this.user = user;
         this.title = title;
+        this.filename = filename;
         this.s3Key = s3Key;
         this.status = status != null ? status : RecordStatus.PENDING;
     }

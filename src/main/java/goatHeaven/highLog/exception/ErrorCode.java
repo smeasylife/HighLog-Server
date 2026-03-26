@@ -40,6 +40,13 @@ public enum ErrorCode {
     // AI Service
     AI_SERVICE_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "AI001", "AI 서비스 오류가 발생했습니다."),
 
+    // Notice
+    NOTICE_NOT_FOUND(HttpStatus.NOT_FOUND, "NOTICE001", "해당 공지사항을 찾을 수 없습니다."),
+    ADMIN_ONLY(HttpStatus.FORBIDDEN, "NOTICE002", "관리자만 접근 가능합니다."),
+
+    // FAQ
+    FAQ_NOT_FOUND(HttpStatus.NOT_FOUND, "FAQ001", "해당 FAQ를 찾을 수 없습니다."),
+
     // S3
     INVALID_FILE_EXTENSION(HttpStatus.BAD_REQUEST, "S3001", "PDF 파일만 업로드할 수 있습니다."),
     INVALID_FILE_NAME(HttpStatus.BAD_REQUEST, "S3002", "잘못된 파일명입니다."),

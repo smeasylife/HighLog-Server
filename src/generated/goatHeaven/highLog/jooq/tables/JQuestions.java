@@ -220,7 +220,7 @@ public class JQuestions extends TableImpl<QuestionsRecord> {
     @Override
     public List<Check<QuestionsRecord>> getChecks() {
         return Arrays.asList(
-            Internal.createCheck(this, DSL.name("questions_difficulty_check"), "(((difficulty)::text = ANY ((ARRAY['BASIC'::character varying, 'PRESSURE'::character varying, 'DEEP'::character varying])::text[])))", true)
+            Internal.createCheck(this, DSL.name("questions_difficulty_check"), "(((difficulty)::text = ANY ((ARRAY['기본'::character varying, '압박'::character varying, '심화'::character varying])::text[])))", true)
         );
     }
 

@@ -22,6 +22,7 @@ public class StudentRecords implements Serializable {
     private String status;
     private String title;
     private Long userId;
+    private String filename;
 
     public StudentRecords() {}
 
@@ -32,6 +33,7 @@ public class StudentRecords implements Serializable {
         this.status = value.status;
         this.title = value.title;
         this.userId = value.userId;
+        this.filename = value.filename;
     }
 
     public StudentRecords(
@@ -40,7 +42,8 @@ public class StudentRecords implements Serializable {
         String s3Key,
         String status,
         String title,
-        Long userId
+        Long userId,
+        String filename
     ) {
         this.id = id;
         this.createdAt = createdAt;
@@ -48,6 +51,7 @@ public class StudentRecords implements Serializable {
         this.status = status;
         this.title = title;
         this.userId = userId;
+        this.filename = filename;
     }
 
     /**
@@ -140,6 +144,21 @@ public class StudentRecords implements Serializable {
         return this;
     }
 
+    /**
+     * Getter for <code>public.student_records.filename</code>.
+     */
+    public String getFilename() {
+        return this.filename;
+    }
+
+    /**
+     * Setter for <code>public.student_records.filename</code>.
+     */
+    public StudentRecords setFilename(String filename) {
+        this.filename = filename;
+        return this;
+    }
+
     @Override
     public boolean equals(Object obj) {
         if (this == obj)
@@ -185,6 +204,12 @@ public class StudentRecords implements Serializable {
         }
         else if (!this.userId.equals(other.userId))
             return false;
+        if (this.filename == null) {
+            if (other.filename != null)
+                return false;
+        }
+        else if (!this.filename.equals(other.filename))
+            return false;
         return true;
     }
 
@@ -198,6 +223,7 @@ public class StudentRecords implements Serializable {
         result = prime * result + ((this.status == null) ? 0 : this.status.hashCode());
         result = prime * result + ((this.title == null) ? 0 : this.title.hashCode());
         result = prime * result + ((this.userId == null) ? 0 : this.userId.hashCode());
+        result = prime * result + ((this.filename == null) ? 0 : this.filename.hashCode());
         return result;
     }
 
@@ -211,6 +237,7 @@ public class StudentRecords implements Serializable {
         sb.append(", ").append(status);
         sb.append(", ").append(title);
         sb.append(", ").append(userId);
+        sb.append(", ").append(filename);
 
         sb.append(")");
         return sb.toString();
