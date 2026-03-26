@@ -14,6 +14,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.http.HttpMethod;
 import org.springframework.web.cors.CorsConfigurationSource;
 
 @Configuration
@@ -45,7 +46,10 @@ public class SecurityConfig {
                                 "/api/auth/login",
                                 "/api/auth/refresh"
                         ).permitAll()
-                        .requestMatchers("/api/notices/**", "/api/faqs/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/notices/**", "/api/faqs/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/notices/**", "/api/faqs/**").authenticated()
+                        .requestMatchers(HttpMethod.PUT, "/api/notices/**", "/api/faqs/**").authenticated()
+                        .requestMatchers(HttpMethod.DELETE, "/api/notices/**", "/api/faqs/**").authenticated()
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated())
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
