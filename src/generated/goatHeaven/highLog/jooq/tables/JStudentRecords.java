@@ -93,6 +93,11 @@ public class JStudentRecords extends TableImpl<StudentRecordsRecord> {
      */
     public final TableField<StudentRecordsRecord, Long> USER_ID = createField(DSL.name("user_id"), SQLDataType.BIGINT.nullable(false), this, "");
 
+    /**
+     * The column <code>public.student_records.filename</code>.
+     */
+    public final TableField<StudentRecordsRecord, String> FILENAME = createField(DSL.name("filename"), SQLDataType.VARCHAR(255).nullable(false), this, "");
+
     private JStudentRecords(Name alias, Table<StudentRecordsRecord> aliased) {
         this(alias, aliased, (Field<?>[]) null, null);
     }
