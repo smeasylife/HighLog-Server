@@ -1206,7 +1206,44 @@ Authorization: Bearer {accessToken}
 
 ---
 
-### 7-5. 회원탈퇴
+### 7-5. 이름 변경
+
+사용자의 이름을 변경합니다.
+
+**Endpoint**
+```
+PATCH /api/users/me/name
+```
+
+**Headers**
+```
+Authorization: Bearer {accessToken}
+```
+
+**Request Body**
+```json
+{
+  "newName": "새이름"
+}
+```
+
+**Response**
+```json
+{
+  "message": "이름이 변경되었습니다."
+}
+```
+
+**Error Cases**
+- `400 Bad Request`: 이름이 비어있거나 50자를 초과합니다.
+
+**이름 정책**
+- 필수 입력
+- 최대 50자
+
+---
+
+### 7-6. 회원탈퇴
 
 본인 확인 후 계정을 삭제합니다. 관련된 모든 데이터(생기부, 질문, 면접 기록 등)가 함께 삭제됩니다.
 

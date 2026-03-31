@@ -2,6 +2,7 @@ package goatHeaven.highLog.service;
 
 import goatHeaven.highLog.jooq.tables.pojos.StudentRecords;
 import goatHeaven.highLog.jooq.tables.pojos.Users;
+import goatHeaven.highLog.dto.request.ChangeNameRequest;
 import goatHeaven.highLog.dto.request.ChangePasswordRequest;
 import goatHeaven.highLog.dto.request.DeleteAccountRequest;
 import goatHeaven.highLog.dto.response.AccountInfoResponse;
@@ -81,6 +82,18 @@ public class UserService {
         log.info("Password changed for user: {}", userId);
 
         return MessageResponse.of("비밀번호가 변경되었습니다.");
+    }
+
+    @Transactional
+    public MessageResponse changeName(Long userId, ChangeNameRequest request) {
+        Users user = userRepository.findById(userId)
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+
+        userRepository.updateName(userId, request.getNewName());
+
+        log.info("Name changed for user: {}", userId);
+
+        return MessageResponse.of("이름이 변경되었습니다.");
     }
 
     @Transactional
