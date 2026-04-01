@@ -10,12 +10,14 @@ import goatHeaven.highLog.jooq.tables.JQuestionSets;
 import goatHeaven.highLog.jooq.tables.JQuestions;
 import goatHeaven.highLog.jooq.tables.JStudentRecords;
 import goatHeaven.highLog.jooq.tables.JUsers;
+import goatHeaven.highLog.jooq.tables.JWithdrawalLogs;
 import goatHeaven.highLog.jooq.tables.records.FaqsRecord;
 import goatHeaven.highLog.jooq.tables.records.NoticesRecord;
 import goatHeaven.highLog.jooq.tables.records.QuestionSetsRecord;
 import goatHeaven.highLog.jooq.tables.records.QuestionsRecord;
 import goatHeaven.highLog.jooq.tables.records.StudentRecordsRecord;
 import goatHeaven.highLog.jooq.tables.records.UsersRecord;
+import goatHeaven.highLog.jooq.tables.records.WithdrawalLogsRecord;
 
 import org.jooq.ForeignKey;
 import org.jooq.TableField;
@@ -43,6 +45,7 @@ public class Keys {
     public static final UniqueKey<StudentRecordsRecord> STUDENT_RECORDS_PKEY = Internal.createUniqueKey(JStudentRecords.STUDENT_RECORDS, DSL.name("student_records_pkey"), new TableField[] { JStudentRecords.STUDENT_RECORDS.ID }, true);
     public static final UniqueKey<UsersRecord> USERS_EMAIL_KEY = Internal.createUniqueKey(JUsers.USERS, DSL.name("users_email_key"), new TableField[] { JUsers.USERS.EMAIL }, true);
     public static final UniqueKey<UsersRecord> USERS_PKEY = Internal.createUniqueKey(JUsers.USERS, DSL.name("users_pkey"), new TableField[] { JUsers.USERS.ID }, true);
+    public static final UniqueKey<WithdrawalLogsRecord> WITHDRAWAL_LOGS_PKEY = Internal.createUniqueKey(JWithdrawalLogs.WITHDRAWAL_LOGS, DSL.name("withdrawal_logs_pkey"), new TableField[] { JWithdrawalLogs.WITHDRAWAL_LOGS.ID }, true);
 
     // -------------------------------------------------------------------------
     // FOREIGN KEY definitions

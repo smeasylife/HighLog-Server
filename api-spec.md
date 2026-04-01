@@ -1260,9 +1260,14 @@ Authorization: Bearer {accessToken}
 **Request Body**
 ```json
 {
-  "password": "CurrentPassword123!"
+  "password": "CurrentPassword123!",
+  "reason": "서비스를 더 이상 이용하지 않아요"
 }
 ```
+
+**Request Fields**
+- `password` (required): 본인 확인용 비밀번호
+- `reason` (optional): 탈퇴 사유
 
 **Response**
 ```json

@@ -10,6 +10,7 @@ import goatHeaven.highLog.jooq.tables.JQuestionSets;
 import goatHeaven.highLog.jooq.tables.JQuestions;
 import goatHeaven.highLog.jooq.tables.JStudentRecords;
 import goatHeaven.highLog.jooq.tables.JUsers;
+import goatHeaven.highLog.jooq.tables.JWithdrawalLogs;
 
 
 /**
@@ -47,4 +48,9 @@ public class Tables {
      * The table <code>public.users</code>.
      */
     public static final JUsers USERS = JUsers.USERS;
+
+    /**
+     * The table <code>public.withdrawal_logs</code>.
+     */
+    public static final JWithdrawalLogs WITHDRAWAL_LOGS = JWithdrawalLogs.WITHDRAWAL_LOGS;
 }
