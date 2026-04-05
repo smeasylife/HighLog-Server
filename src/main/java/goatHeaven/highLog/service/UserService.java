@@ -2,6 +2,7 @@ package goatHeaven.highLog.service;
 
 import goatHeaven.highLog.jooq.tables.pojos.StudentRecords;
 import goatHeaven.highLog.jooq.tables.pojos.Users;
+import goatHeaven.highLog.dto.request.ChangeNameRequest;
 import goatHeaven.highLog.dto.request.ChangePasswordRequest;
 import goatHeaven.highLog.dto.request.DeleteAccountRequest;
 import goatHeaven.highLog.dto.response.AccountInfoResponse;
@@ -12,13 +13,16 @@ import goatHeaven.highLog.exception.ErrorCode;
 import goatHeaven.highLog.repository.QuestionRepository;
 import goatHeaven.highLog.repository.StudentRecordRepository;
 import goatHeaven.highLog.repository.UserRepository;
+import goatHeaven.highLog.repository.WithdrawalLogRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -31,6 +35,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final StudentRecordRepository studentRecordRepository;
     private final QuestionRepository questionRepository;
+    private final WithdrawalLogRepository withdrawalLogRepository;
     private final RedisService redisService;
     private final S3Service s3Service;
     private final PasswordEncoder passwordEncoder;
@@ -84,6 +89,18 @@ public class UserService {
     }
 
     @Transactional
+    public MessageResponse changeName(Long userId, ChangeNameRequest request) {
+        Users user = userRepository.findById(userId)
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+
+        userRepository.updateName(userId, request.getNewName());
+
+        log.info("Name changed for user: {}", userId);
+
+        return MessageResponse.of("이름이 변경되었습니다.");
+    }
+
+    @Transactional
     public MessageResponse deleteAccount(Long userId, DeleteAccountRequest request) {
         Users user = userRepository.findById(userId)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
@@ -108,6 +125,10 @@ public class UserService {
 
         // 관련 데이터 삭제 (Questions → QuestionSets → StudentRecords)
         studentRecordRepository.deleteAllByUserId(userId);
+
+        // 탈퇴 로그 저장 (사용자 삭제 전에 가입 기간 계산)
+        int membershipDays = (int) ChronoUnit.DAYS.between(user.getCreatedAt(), LocalDateTime.now());
+        withdrawalLogRepository.insert(request.getReason(), membershipDays);
 
         // 사용자 삭제
         userRepository.deleteById(userId);

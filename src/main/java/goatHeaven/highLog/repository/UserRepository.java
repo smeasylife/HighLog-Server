@@ -52,6 +52,14 @@ public class UserRepository {
                 .execute();
     }
 
+    public void updateName(Long userId, String newName) {
+        dsl.update(USERS)
+                .set(USERS.NAME, newName)
+                .set(USERS.UPDATED_AT, LocalDateTime.now())
+                .where(USERS.ID.eq(userId))
+                .execute();
+    }
+
     public void deleteById(Long userId) {
         dsl.deleteFrom(USERS)
                 .where(USERS.ID.eq(userId))

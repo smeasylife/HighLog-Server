@@ -1,5 +1,6 @@
 package goatHeaven.highLog.controller;
 
+import goatHeaven.highLog.dto.request.ChangeNameRequest;
 import goatHeaven.highLog.dto.request.ChangePasswordRequest;
 import goatHeaven.highLog.dto.request.DeleteAccountRequest;
 import goatHeaven.highLog.dto.response.AccountInfoResponse;
@@ -40,6 +41,14 @@ public class UserController {
             @Valid @RequestBody ChangePasswordRequest request) {
 
         return ResponseEntity.ok(userService.changePassword(principal.getUserId(), request));
+    }
+
+    @PatchMapping("/name")
+    public ResponseEntity<MessageResponse> changeName(
+            @AuthenticationPrincipal CustomUserPrincipal principal,
+            @Valid @RequestBody ChangeNameRequest request) {
+
+        return ResponseEntity.ok(userService.changeName(principal.getUserId(), request));
     }
 
     @DeleteMapping

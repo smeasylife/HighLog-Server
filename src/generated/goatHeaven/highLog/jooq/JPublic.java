@@ -10,6 +10,7 @@ import goatHeaven.highLog.jooq.tables.JQuestionSets;
 import goatHeaven.highLog.jooq.tables.JQuestions;
 import goatHeaven.highLog.jooq.tables.JStudentRecords;
 import goatHeaven.highLog.jooq.tables.JUsers;
+import goatHeaven.highLog.jooq.tables.JWithdrawalLogs;
 
 import java.util.Arrays;
 import java.util.List;
@@ -64,6 +65,11 @@ public class JPublic extends SchemaImpl {
     public final JUsers USERS = JUsers.USERS;
 
     /**
+     * The table <code>public.withdrawal_logs</code>.
+     */
+    public final JWithdrawalLogs WITHDRAWAL_LOGS = JWithdrawalLogs.WITHDRAWAL_LOGS;
+
+    /**
      * No further instances allowed
      */
     private JPublic() {
@@ -84,7 +90,8 @@ public class JPublic extends SchemaImpl {
             JQuestionSets.QUESTION_SETS,
             JQuestions.QUESTIONS,
             JStudentRecords.STUDENT_RECORDS,
-            JUsers.USERS
+            JUsers.USERS,
+            JWithdrawalLogs.WITHDRAWAL_LOGS
         );
     }
 }
