@@ -79,7 +79,8 @@ dependencies {
 	jooqGenerator "org.jooq:jooq-meta:${jooqVersion}"
 
 	implementation 'org.springframework.boot:spring-boot-starter-actuator'
-	implementation 'io.micrometer:micrometer-registry-prometheus'
+	runtimeOnly 'io.micrometer:micrometer-registry-prometheus'
+
 }
 
 jooq {
